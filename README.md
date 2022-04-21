@@ -2,7 +2,7 @@
 
 ## What's this?
 
-Harmony is a command line tool to stream music and videos without worrying about prying eyes from the likes of Youtube. It has minimal resource usage thanks to mpv and does not make requests to youtube to get results.
+Harmony is a command line tool to stream music and videos without worrying about prying eyes from the likes of Youtube. It has minimal resource usage thanks to mpv and does not make requests to youtube to get results. It uses [`piped`](https://piped.kavin.rocks) which is an alternative frontend to Youtube.
 
 ## Requirements
 
