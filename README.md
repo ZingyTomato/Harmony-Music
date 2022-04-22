@@ -10,7 +10,7 @@
 
 ## What's this?
 
-Harmony is a command line tool to stream music and videos without worrying about prying eyes from the likes of Youtube.
+Harmony is a command line tool to stream music and videos without worrying about prying eyes from the likes of Youtube. Instead of directly scraping Youtube, Harmony uses [`Piped`](https://github.com/TeamPiped/Piped) instead. This results in not only quicker fetching of results but also prevents Youtube from seeing your IP, all from the comfort of the terminal. 
 
 ## Features
 
@@ -34,7 +34,7 @@ sudo wget https://github.com/ZingyTomato/harmonymusic/releases/latest/download/h
 sudo chmod a+rx /usr/local/bin/harmony
 ```
 
-## Commands
+## Usage
 
 ```
   -h, --help           show this help message and exit
