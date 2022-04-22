@@ -1,8 +1,23 @@
-# Harmony Music
+<div align="center">
+<h1>Harmony Music</h1>
+<h4>An easy way to stream videos or music from the command line while regaining your privacy.</h4>
+</div>
+
+<div align="center" width="60%" height="auto">
+  <br>
+    <img src="Showcase/2022-04-22 11-47-05.gif">
+</div>
 
 ## What's this?
 
-Harmony is a command line tool to stream music and videos without worrying about prying eyes from the likes of Youtube. It has minimal resource usage thanks to mpv and does not make requests to youtube to get results. It uses [`piped`](https://piped.kavin.rocks) which is an alternative frontend to Youtube.
+Harmony is a command line tool to stream music and videos without worrying about prying eyes from the likes of Youtube.
+
+## Features
+
+- [x] Minimal Resource Usage. (Around 1-2% CPU usage while streaming music and 5-10% while playing videos thanks to [`mpv`](https://mpv.io))
+- [x] No requests made to Youtube to fetch results. [`Piped`](https://github.com/TeamPiped/Piped) is used instead.
+- [x] No tracking from Youtube.
+- [x] Ability to filter search queries by music, videos, albums or playlists.
 
 ## Requirements
 
@@ -12,12 +27,7 @@ Harmony is a command line tool to stream music and videos without worrying about
 
 ## Installation
 
-Simply download the release binary (Linux only for now) from the [releases section](https://github.com/ZingyTomato/harmonymusic/releases) or enter the commands below in any Linux terminal.
-
-```
-sudo curl -L https://github.com/ZingyTomato/harmonymusic/releases/latest/download/harmony -o /usr/local/bin/harmony
-sudo chmod a+rx /usr/local/bin/harmony
-```
+Simply download the release binary (Linux only for now) from the [releases section](https://github.com/ZingyTomato/harmonymusic/releases) or enter the following commands below in any Linux terminal.
 
 ```
 sudo wget https://github.com/ZingyTomato/harmonymusic/releases/latest/download/harmony -O /usr/local/bin/harmony
