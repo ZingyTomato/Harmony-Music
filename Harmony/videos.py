@@ -5,7 +5,7 @@ from termcolor import colored
 import functions
 
 def searchVideos():
-  video = input(colored("Add videos to the Queue ", 'cyan', attrs=['bold']) + colored("(P)lay, (S)how Queue, (B)ack, (Q)uit: ", 'red'))
+  video = input(colored("\nAdd videos to the Queue ", 'cyan', attrs=['bold']) + colored("(P)lay, (S)how Queue, (B)ack, (Q)uit: ", 'red'))
   
   if re.match(functions.YOUTUBE_REGEX, video):
     return functions.youtubeLink(), functions.playVideosURL(video), searchVideos()
@@ -55,7 +55,7 @@ def pickVideo(json, video):
     return functions.invalidInput(), pickVideo(json, video)
     
   elif option == "b" or option == "B":
-    return print("\n"), searchVideos()
+    return searchVideos()
 
   elif option == "q" or option == "Q":
     return functions.exitProgram()

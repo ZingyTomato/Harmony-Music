@@ -5,7 +5,7 @@ from termcolor import colored
 import functions
 
 def searchSongs():
-  song = input(colored("Add songs to the Queue ", 'cyan', attrs=['bold']) + colored("(P)lay, (S)how Queue, (B)ack, (Q)uit: ", 'red'))
+  song = input(colored("\nAdd songs to the Queue ", 'cyan', attrs=['bold']) + colored("(P)lay, (S)how Queue, (B)ack, (Q)uit: ", 'red'))
 
   if re.match(functions.YOUTUBE_REGEX, song):
     return functions.youtubeLink(), functions.playTracksURL(song), searchSongs()
@@ -55,7 +55,7 @@ def pickTrack(json, song):
     return functions.invalidInput(), pickTrack(json, song)
     
   elif option == "b" or option == "B":
-    return print("\n"), searchSongs()
+    return searchSongs()
 
   elif option == "q" or option == "Q":
     return functions.exitProgram()

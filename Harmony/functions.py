@@ -47,7 +47,7 @@ def albumLink():
     return info
 
 def invalidInput():
-    exitmsg = print(colored("\nInvalid input Entered!\n", 'red', attrs=['bold']))
+    exitmsg = print(colored("\nInvalid input Entered!", 'red', attrs=['bold']))
     return exitmsg
 
 def exitProgram():
@@ -55,19 +55,22 @@ def exitProgram():
     return os.system("exit"), exitmsg
 
 def noResults(result):
-    info = print(colored(f"Unable to find any results for {colored(result, 'cyan')}! \n", 'red', attrs=['bold']))
+    info = print(colored(f"Unable to find any results for {colored(result, 'cyan')}!", 'red', attrs=['bold']))
     return info
 
 def invalidRange():
     exitmsg = print(colored("\nInteger out of range!", 'red', attrs=['bold']))
     return exitmsg
 
+def queueIsEmpty():
+    empty = print(colored("\nThe queue is empty!",'red', attrs=['bold']))
+    return empty
+
 def showQueue(item_list):
     if len(item_list) == 0:
-      empty = print(colored("\nThe queue is empty!\n",'red', attrs=['bold']))
-      return empty
+      return queueIsEmpty()
     else:
-      show_queue = print(f"\n".join([f"{colored(i, 'green')}. {track} \n" for i, track in enumerate((item_list))]))     
+      show_queue = print(f"\n".join([f"\n{colored(i, 'green')}. {track}" for i, track in enumerate((item_list))]))     
       return show_queue
 
 def showResults(query, result):
@@ -106,8 +109,7 @@ def getPlaylists(query):
     
 def playTracks(item_list, queue_list):
     if len(item_list) == 0:
-      empty = print(colored("\nThe queue is empty!\n",'red', attrs=['bold']))
-      return empty
+      return queueIsEmpty()
     queuemsg = print(colored("\nPlaying items in the queue", 'cyan', attrs=['bold']) + colored(' (q to quit)\n', 'red')) 
     show_queue = print(f"\n".join([f"{colored(i, 'green')}. {track} \n" for i, track in enumerate((item_list))]))     
     play_tracks = os.system(f"mpv --vo=null --cache=yes --video=no --no-video --term-osd-bar --no-resume-playback {' '.join(queue_list)} ")
@@ -115,8 +117,7 @@ def playTracks(item_list, queue_list):
 
 def playVideos(item_list, queue_list):
     if len(item_list) == 0:
-      empty = print(colored("\nThe queue is empty!\n",'red', attrs=['bold']))
-      return empty
+      return queueIsEmpty()
     queuemsg = print(colored("\nPlaying items in the queue", 'cyan', attrs=['bold']) + colored(' (q to quit)\n', 'red')) 
     show_queue = print(f"\n".join([f"{colored(i, 'green')}. {track} \n" for i, track in enumerate((item_list))]))     
     play_videos = os.system(f"mpv --cache=yes --term-osd-bar --no-resume-playback {' '.join(queue_list)} ")
@@ -134,20 +135,20 @@ def addItems(videoid, title, author):
     stream_url = f"{PIPED_URL}" + f"{videoid}"
     queue_list.append(stream_url)
     item_list.append(f"{title} - {author}")
-    added = print(colored(f"\n{title} - ", 'cyan') + colored(f'{author}', 'red') + colored(" has been added to the queue.\n", 'green'))
+    added = print(colored(f"\n{title} - ", 'cyan') + colored(f'{author}', 'red') + colored(" has been added to the queue.", 'green'))
     return added
 
 def chooseOption():
     option = input(colored("\nSelect an option ", 'cyan', attrs=['bold']) + colored("(S)ongs, (V)ideos, (P)laylists, (A)lbums, Q(uit): ", 'red'))
     if option == "S" or option == "s":
-        return print("\n"), songs.searchSongs()
+        return songs.searchSongs()
     elif option == "V" or option == "v":
-        return print("\n"), videos.searchVideos()
+        return videos.searchVideos()
     elif option == "P" or option == "p":
-        return print("\n"), playlists.searchPlaylists()
+        return playlists.searchPlaylists()
     elif option == "A" or option == "a":
-        return print("\n"), albums.searchAlbums()
-    elif option == "Q" or option == "q" or option == "B" or option == "b":
+        return albums.searchAlbums()
+    elif option == "Q" or option == "q":
         return exitProgram()
     else:
         return invalidInput(), chooseOption()

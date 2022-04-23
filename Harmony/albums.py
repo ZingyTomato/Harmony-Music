@@ -5,7 +5,7 @@ from termcolor import colored
 import functions
 
 def searchAlbums():
-  album = input(colored("Add albums to the Queue ", 'cyan', attrs=['bold']) + colored("(P)lay, (S)how Queue, (B)ack, (Q)uit: ", 'red'))
+  album = input(colored("\nAdd albums to the Queue ", 'cyan', attrs=['bold']) + colored("(P)lay, (S)how Queue, (B)ack, (Q)uit: ", 'red'))
 
   if re.match(functions.URL_REGEX, album):
     return functions.albumLink(), searchAlbums()
@@ -49,7 +49,7 @@ def pickAlbum(json, album):
     return functions.invalidInput(), pickAlbum(json, album)
     
   elif option == "b" or option == "B":
-    return print("\n"), searchAlbums()
+    return searchAlbums()
 
   elif option == "q" or option == "Q":
     return functions.exitProgram()

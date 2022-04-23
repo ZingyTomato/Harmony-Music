@@ -5,7 +5,7 @@ from termcolor import colored
 import functions
 
 def searchPlaylists():
-  playlist = input(colored("Add playlists to the Queue ", 'cyan', attrs=['bold']) + colored("(P)lay, (S)how Queue, (B)ack, (Q)uit: ", 'red'))
+  playlist = input(colored("\nAdd playlists to the Queue ", 'cyan', attrs=['bold']) + colored("(P)lay, (S)how Queue, (B)ack, (Q)uit: ", 'red'))
 
   if re.match(functions.URL_REGEX, playlist):
     return functions.playlistLink(), searchPlaylists()
@@ -46,7 +46,7 @@ def pickPlaylist(json, playlist):
     return functions.invalidInput(), pickPlaylist(json, playlist)
     
   elif option == "b" or option == "B":
-    return print("\n"), searchPlaylists()
+    return searchPlaylists()
 
   elif option == "q" or option == "Q":
     return functions.exitProgram()
