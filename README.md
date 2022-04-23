@@ -10,12 +10,12 @@
 
 # 📖 Table Of Contents
 
-* [`What's this?`](#-whats-this)
-* [`Features`](#-features)
-* [`Requirements`](#-requirements)
-* [`Force mpv to use yt-dlp over youtube-dl`](#-force-mpv-to-use-yt-dlp-over-youtube-dl)
-* [`Installation`](#-installation)
-* [`Usage`](#-usage)
+* [`❔ What's this?`](#-whats-this)
+* [`🎧 Features`](#-features)
+* [`📜 Requirements`](#-requirements)
+* [`🛑 Force mpv to use yt-dlp over youtube-dl`](#-force-mpv-to-use-yt-dlp-over-youtube-dl)
+* [`💻 Installation`](#-installation)
+* [`👨‍🔧 Usage`](#-usage)
 
 ## ❔ What's this?
 
@@ -37,14 +37,15 @@ Harmony is a command line tool to stream music and videos without worrying about
 
 ## 🛑 Force mpv to use yt-dlp over youtube-dl
 
-yt-dlp is recommended over youtube-dl as it tends to load videos quicker and more importantly works with the **--playlist** flag.
+yt-dlp is suggested over youtube-dl as it tends to load videos, music etc. quicker and more importantly works with the **--playlist** flag.
 
-If you already have youtube-dl installed, either remove youtube-dl and install yt-dlp instead or add this line to `~/.config/MPV/mpv.conf`
+The recommended way to solve this issue is to just uninstall `youtube-dl` and install `yt-dlp` instead.
+
+However, if you would like to have both `youtube-dl` and `yt-dlp` installed on your system, add this line to `~/.config/MPV/mpv.conf`
 
 ```
-script-opts=ytdl_hook-ytdl_path=/usr/bin/yt-dlp
+script-opts=ytdl_hook-ytdl_path=yt-dlp
 ```
-If this doesn't work, find out where yt-dlp is located using `whereis yt-dlp` and replace `/usr/bin/yt-dlp` with it.
 
 ## 💻 Installation
 
