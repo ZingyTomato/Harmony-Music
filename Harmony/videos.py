@@ -16,8 +16,8 @@ def searchVideos():
   elif re.match(functions.PLAYLIST_REGEX, video):
     return functions.playlistLink(), searchVideos()
 
-  if video.isnumeric() == True and video != "e" and video != "E" and video != "p" and video != "P":
-    return functions.invalidString(), searchVideos()
+  if video.isnumeric() == True:
+    return functions.invalidInput(), searchVideos()
     
   elif video == "q" or video == "Q":
     return functions.exitProgram()
@@ -48,13 +48,16 @@ def listVideos(video):
   return functions.showResults(video, search_results), pickVideo(search_results, video)
 
 def pickVideo(json, video):
-  option = input(colored("\nPick an option", 'cyan', attrs=['bold']) + colored(f" [0:19, (B)ack]: ", 'red'))
+  option = input(colored("\nPick an option", 'cyan', attrs=['bold']) + colored(f" [0:19, (B)ack, (Q)uit]: ", 'red'))
 
-  if option.isnumeric() == False and option != "b" and option != "B":
-    return functions.invalidInteger(), pickVideo(json, video)
+  if option.isnumeric() == False and option != "b" and option != "B" and option != "q" and option != "Q":
+    return functions.invalidInput(), pickVideo(json, video)
     
   elif option == "b" or option == "B":
     return print("\n"), searchVideos()
+
+  elif option == "q" or option == "Q":
+    return functions.exitProgram()
 
   if int(option) >= 19:
     return functions.invalidRange(), pickVideo(json, video)

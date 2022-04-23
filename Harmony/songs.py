@@ -16,8 +16,8 @@ def searchSongs():
   elif re.match(functions.PLAYLIST_REGEX, song):
     return functions.playlistLink(), searchSongs()
 
-  if song.isnumeric() == True and song != "e" and song != "E" and song != "p" and song != "P":
-    return functions.invalidString(), searchSongs()
+  if song.isnumeric() == True:
+    return functions.invalidInput(), searchSongs()
     
   elif song == "q" or song == "Q":
     return functions.exitProgram()
@@ -48,13 +48,16 @@ def listTracks(song):
   return functions.showResults(song, search_results), pickTrack(search_results, song)
 
 def pickTrack(json, song):
-  option = input(colored("\nPick an option", 'cyan', attrs=['bold']) + colored(f" [0:19, (B)ack]: ", 'red'))
+  option = input(colored("\nPick an option", 'cyan', attrs=['bold']) + colored(f" [0:19, (B)ack, (Q)uit]: ", 'red'))
 
-  if option.isnumeric() == False and option != "b" and option != "B":
-    return functions.invalidInteger(), pickTrack(json, song)
+  if option.isnumeric() == False and option != "b" and option != "B" and option != "q" and option != "Q":
+    return functions.invalidInput(), pickTrack(json, song)
     
   elif option == "b" or option == "B":
     return print("\n"), searchSongs()
+
+  elif option == "q" or option == "Q":
+    return functions.exitProgram()
 
   if int(option) >= 19:
     return functions.invalidRange(), pickTrack(json, song)

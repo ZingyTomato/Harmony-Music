@@ -13,8 +13,8 @@ def searchAlbums():
   elif re.match(functions.PLAYLIST_REGEX, album):
     return functions.playlistLink(), searchAlbums()
 
-  if album.isnumeric() == True and album != "q" and album != "Q" and album != "p" and album != "P":
-    return functions.invalidString(), searchAlbums()
+  if album.isnumeric() == True:
+    return functions.invalidInput(), searchAlbums()
     
   elif album == "q" or album == "Q":
     return functions.exitProgram()
@@ -42,13 +42,16 @@ def listAlbums(album):
   return functions.showResultsAlbumsPlaylists(album, search_results), pickAlbum(search_results, album)
 
 def pickAlbum(json, album):
-  option = input(colored("\nPick an option", 'cyan', attrs=['bold']) + colored(f" [0:19, (B)ack]: ", 'red'))
+  option = input(colored("\nPick an option", 'cyan', attrs=['bold']) + colored(f" [0:19, (B)ack, (Q)uit]: ", 'red'))
 
-  if option.isnumeric() == False and option != "b" and option != "B":
-    return functions.invalidInteger(), pickAlbum(json, album)
+  if option.isnumeric() == False and option != "b" and option != "B" and option != "q" and option != "Q":
+    return functions.invalidInput(), pickAlbum(json, album)
     
   elif option == "b" or option == "B":
     return print("\n"), searchAlbums()
+
+  elif option == "q" or option == "Q":
+    return functions.exitProgram()
 
   if int(option) >= 19:
     return functions.invalidRange(), pickAlbum(json, album)

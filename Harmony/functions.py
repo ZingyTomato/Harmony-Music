@@ -22,6 +22,10 @@ URL_REGEX = r"(http|ftp|https):\/\/([\w\-_]+(?:(?:\.[\w\-_]+)+))([\w\-\.,@?^=%&:
 
 PLAYLIST_REGEX = r" /^.*(youtu.be\/|list=)([^#\&\?]*).*/"
 
+PIPEDAPI_URL = "https://pipedapi.kavin.rocks"
+
+PIPED_URL = "https://piped.kavin.rocks"
+
 def emptyQueue():
     item_list.clear()
     queue_list.clear()
@@ -42,12 +46,8 @@ def albumLink():
     info = print(colored("\nLinks are not supported. Use --album to search for albums.", color='red', attrs=['bold'])  + colored(' (q to quit)\n', 'red'))
     return info
 
-def invalidString():
-    exitmsg = print(colored("\nPlease enter a valid string!\n", 'red', attrs=['bold']))
-    return exitmsg
-
-def invalidInteger():
-    exitmsg = print(colored("\nPlease enter a valid integer!", 'red', attrs=['bold']))
+def invalidInput():
+    exitmsg = print(colored("\nInvalid input Entered!\n", 'red', attrs=['bold']))
     return exitmsg
 
 def exitProgram():
@@ -82,25 +82,25 @@ def showResultsAlbumsPlaylists(query, result):
 
 def getSongs(query):
     print(colored("\nSearching for songs... \n", 'cyan', attrs=['bold']))
-    searchurl = requests.request("GET", f"https://pipedapi.kavin.rocks/search?q={query}&filter=music_songs", headers=headers).text
+    searchurl = requests.request("GET", f"{PIPEDAPI_URL}/search?q={query}&filter=music_songs", headers=headers).text.encode()
     searchjson = json.loads(searchurl)
     return searchjson
 
 def getVideos(query):
     print(colored("\nSearching for videos... \n", 'cyan', attrs=['bold']))
-    searchurl = requests.request("GET", f"https://pipedapi.kavin.rocks/search?q={query}&filter=videos", headers=headers).text
+    searchurl = requests.request("GET", f"{PIPEDAPI_URL}/search?q={query}&filter=videos", headers=headers).text.encode()
     searchjson = json.loads(searchurl)
     return searchjson
 
 def getAlbums(query):
     print(colored("\nSearching for albums... \n", 'cyan', attrs=['bold']))
-    searchurl = requests.request("GET", f"https://pipedapi.kavin.rocks/search?q={query}&filter=music_albums", headers=headers).text
+    searchurl = requests.request("GET", f"{PIPEDAPI_URL}/search?q={query}&filter=music_albums", headers=headers).text.encode()
     searchjson = json.loads(searchurl)
     return searchjson
 
 def getPlaylists(query):
     print(colored("\nSearching for playlists... \n", 'cyan', attrs=['bold']))
-    searchurl = requests.request("GET", f"https://pipedapi.kavin.rocks/search?q={query}&filter=playlists", headers=headers).text
+    searchurl = requests.request("GET", f"{PIPEDAPI_URL}/search?q={query}&filter=playlists", headers=headers).text.encode()
     searchjson = json.loads(searchurl)
     return searchjson
     
@@ -131,7 +131,7 @@ def playTracksURL(url):
     return play_videos
 
 def addItems(videoid, title, author):
-    stream_url = "https://piped.kavin.rocks" + f"{videoid}"
+    stream_url = f"{PIPED_URL}" + f"{videoid}"
     queue_list.append(stream_url)
     item_list.append(f"{title} - {author}")
     added = print(colored(f"\n{title} - ", 'cyan') + colored(f'{author}', 'red') + colored(" has been added to the queue.\n", 'green'))

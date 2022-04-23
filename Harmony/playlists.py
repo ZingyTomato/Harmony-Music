@@ -10,8 +10,8 @@ def searchPlaylists():
   if re.match(functions.URL_REGEX, playlist):
     return functions.playlistLink(), searchPlaylists()
 
-  if playlist.isnumeric() == True and playlist != "q" and playlist != "Q" and playlist != "p" and playlist != "P":
-    return functions.invalidString(), searchPlaylists()
+  if playlist.isnumeric() == True:
+    return functions.invalidInput(), searchPlaylists()
     
   elif playlist == "q" or playlist == "Q":
     return functions.exitProgram()
@@ -39,13 +39,16 @@ def listPlaylists(playlist):
   return functions.showResultsAlbumsPlaylists(playlist, search_results), pickPlaylist(search_results, playlist)
 
 def pickPlaylist(json, playlist):
-  option = input(colored("\nPick an option", 'cyan', attrs=['bold']) + colored(f" [0:19, (B)ack]: ", 'red'))
+  option = input(colored("\nPick an option", 'cyan', attrs=['bold']) + colored(f" [0:19, (B)ack, (Q)uit]: ", 'red'))
 
-  if option.isnumeric() == False and option != "b" and option != "B":
-    return functions.invalidInteger(), pickPlaylist(json, playlist)
+  if option.isnumeric() == False and option != "b" and option != "B" and option != "q" and option != "Q":
+    return functions.invalidInput(), pickPlaylist(json, playlist)
     
   elif option == "b" or option == "B":
     return print("\n"), searchPlaylists()
+
+  elif option == "q" or option == "Q":
+    return functions.exitProgram()
 
   if int(option) >= 19:
     return functions.invalidRange(), pickPlaylist(json, playlist)
