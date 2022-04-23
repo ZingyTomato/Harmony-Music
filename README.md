@@ -44,7 +44,7 @@ The recommended way to solve this issue is to just uninstall `youtube-dl` and in
 However, if you would like to have both `youtube-dl` and `yt-dlp` installed on your system, add this line to `~/.config/MPV/mpv.conf`
 
 ```
-script-opts=ytdl_hook-ytdl_path=yt-dlp
+script-opts-append=ytdl_hook-ytdl_path=yt-dlp
 ```
 
 ## 💻 Installation
