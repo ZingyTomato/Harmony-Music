@@ -42,7 +42,7 @@ yt-dlp is recommended over youtube-dl as it tends to load videos quicker and mor
 If you already have youtube-dl installed, either remove youtube-dl and install yt-dlp instead or add this line to `~/.config/MPV/mpv.conf`
 
 ```
-sript-opts=ytdl_hook-ytdl_path=/usr/bin/yt-dlp
+script-opts=ytdl_hook-ytdl_path=/usr/bin/yt-dlp
 ```
 If this doesn't work, find out where yt-dlp is located using `whereis yt-dlp` and replace `/usr/bin/yt-dlp` with it.
 
