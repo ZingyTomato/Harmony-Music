@@ -32,7 +32,7 @@ Harmony is a command line tool to stream music and videos without worrying about
 
 1. [`mpv`](https://mpv.io) - An open source command line video player.
 
-2. [`youtube-dl`](https://github.com/ytdl-org/youtube-dl) - Command-line program to download videos from YouTube.com and other video sites.
+2. [`yt-dlp`](https://github.com/yt-dlp/yt-dlp) - A youtube-dl fork with additional features and fixes. This is preferred over youtube-dl for a better experience.
 
 ## 💻 Installation
 
