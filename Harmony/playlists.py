@@ -39,7 +39,8 @@ def listPlaylists(playlist):
   return functions.showResultsAlbumsPlaylists(playlist, search_results), pickPlaylist(search_results, playlist)
 
 def pickPlaylist(json, playlist):
-  option = input(colored("\nPick an option", 'cyan', attrs=['bold']) + colored(f" [0:19, (B)ack, (Q)uit]: ", 'red'))
+  item_length = len(json['items'])
+  option = input(colored("\nPick an option", 'cyan', attrs=['bold']) + colored(f" [1:{item_length}, (B)ack, (Q)uit]: ", 'red'))
 
   if option.isnumeric() == False and option != "b" and option != "B" and option != "q" and option != "Q":
     return functions.invalidInput(), pickPlaylist(json, playlist)
@@ -50,10 +51,10 @@ def pickPlaylist(json, playlist):
   elif option == "q" or option == "Q":
     return functions.exitProgram()
 
-  if int(option) >= 19:
+  if int(option) > item_length or int(option) < 1:
     return functions.invalidRange(), pickPlaylist(json, playlist)
 
-  videoid = json['items'][int(option)]['url']
-  title = colored(json['items'][int(option)]['name'], 'red')
-  author = colored(json['items'][int(option)]['uploaderName'], 'cyan')
+  videoid = json['items'][int(option) - 1]['url']
+  title = colored(json['items'][int(option) - 1]['name'], 'red')
+  author = colored(json['items'][int(option) - 1]['uploaderName'], 'cyan')
   return functions.addItems(videoid, title, author), searchPlaylists()

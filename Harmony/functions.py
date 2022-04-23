@@ -72,12 +72,12 @@ def showQueue(item_list):
 
 def showResults(query, result):
     info = print(colored("Results for", 'red') + colored(f" {query}\n", 'cyan', attrs=['bold']))
-    lists = print(f"\n".join([f"{colored(i, 'green')}. {item['title']} - {item['uploaderName']} ({time.strftime('%M:%S',time.gmtime(item['duration']))})" for i, item in enumerate((result['items']))]))
+    lists = print(f"\n".join([f"{colored(i, 'green')}. {item['title']} - {item['uploaderName']} ({time.strftime('%M:%S',time.gmtime(item['duration']))})" for i, item in enumerate((result['items']), start=1)]))
     return info, lists
 
 def showResultsAlbumsPlaylists(query, result):
     info = print(colored("Results for", 'red') + colored(f" {query}\n", 'cyan', attrs=['bold']))
-    lists = print(f"\n".join([f"{colored(i, 'green')}. {item['name']} - {item['uploaderName']}" for i, item in enumerate((result['items']))]))
+    lists = print(f"\n".join([f"{colored(i, 'green')}. {item['name']} - {item['uploaderName']}" for i, item in enumerate((result['items']), start=1)]))
     return info, lists
 
 def getSongs(query):
@@ -150,6 +150,5 @@ def chooseOption():
     elif option == "Q" or option == "q" or option == "B" or option == "b":
         return exitProgram()
     else:
-        info = print(colored("\nInvalid option entered!", 'red', attrs=['bold'])) 
-        return info, chooseOption()
+        return invalidInput(), chooseOption()
     return

@@ -48,7 +48,8 @@ def listTracks(song):
   return functions.showResults(song, search_results), pickTrack(search_results, song)
 
 def pickTrack(json, song):
-  option = input(colored("\nPick an option", 'cyan', attrs=['bold']) + colored(f" [0:19, (B)ack, (Q)uit]: ", 'red'))
+  item_length = len(json['items'])
+  option = input(colored("\nPick an option", 'cyan', attrs=['bold']) + colored(f" [1:{item_length}, (B)ack, (Q)uit]: ", 'red'))
 
   if option.isnumeric() == False and option != "b" and option != "B" and option != "q" and option != "Q":
     return functions.invalidInput(), pickTrack(json, song)
@@ -59,10 +60,10 @@ def pickTrack(json, song):
   elif option == "q" or option == "Q":
     return functions.exitProgram()
 
-  if int(option) >= 19:
+  if int(option) > item_length or int(option) < 1:
     return functions.invalidRange(), pickTrack(json, song)
 
-  videoid = json['items'][int(option)]['url']
-  title = colored(json['items'][int(option)]['title'], 'red')
-  author = colored(json['items'][int(option)]['uploaderName'], 'cyan')
+  videoid = json['items'][int(option) - 1]['url']
+  title = colored(json['items'][int(option) - 1]['title'], 'red')
+  author = colored(json['items'][int(option) - 1]['uploaderName'], 'cyan')
   return functions.addItems(videoid, title, author), searchSongs()
