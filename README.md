@@ -13,6 +13,7 @@
 * [`What's this?`](#-whats-this)
 * [`Features`](#-features)
 * [`Requirements`](#-requirements)
+* [`Force mpv to use yt-dlp over youtube-dl`](#-force-mpv-to-use-yt-dlp-over-youtube-dl)
 * [`Installation`](#-installation)
 * [`Usage`](#-usage)
 
@@ -33,6 +34,17 @@ Harmony is a command line tool to stream music and videos without worrying about
 1. [`mpv`](https://mpv.io) - An open source command line video player.
 
 2. [`yt-dlp`](https://github.com/yt-dlp/yt-dlp) - A youtube-dl fork with additional features and fixes. This is preferred over youtube-dl for a better experience.
+
+## 🛑 Force mpv to use yt-dlp over youtube-dl
+
+yt-dlp is recommended over youtube-dl as it tends to load videos quicker and more importantly works with the **--playlist** flag.
+
+If you already have youtube-dl installed, either remove youtube-dl and install yt-dlp instead or add this line to `~/.config/MPV/mpv.conf`
+
+```
+sript-opts=ytdl_hook-ytdl_path=/usr/bin/yt-dlp
+```
+If this doesn't work, find out where yt-dlp is located using `whereis yt-dlp` and replace `/usr/bin/yt-dlp` with it.
 
 ## 💻 Installation
 
