@@ -31,11 +31,11 @@ def emptyQueue():
     queue_list.clear()
 
 def youtubeLink():
-    info = print(colored("\nYoutube URL detected, directly playing the link.", color='cyan', attrs=['bold'])  + colored(' (q to quit)\n', 'red'))
+    info = print(colored("Youtube URL detected, directly playing the link.", color='cyan', attrs=['bold'])  + colored(' (q to quit)\n', 'red'))
     return info
 
 def urlLink():
-    info = print(colored("\nURL detected, trying to directly play the link.", color='cyan', attrs=['bold'])  + colored(' (q to quit)\n', 'red'))
+    info = print(colored("URL detected, trying to directly play the link.", color='cyan', attrs=['bold'])  + colored(' (q to quit)\n', 'red'))
     return info
 
 def playlistLink():
@@ -84,27 +84,43 @@ def showResultsAlbumsPlaylists(query, result):
     return info, lists
 
 def getSongs(query):
-    print(colored("\nSearching for songs... \n", 'cyan', attrs=['bold']))
+    print(colored("\nSearching for songs...\n", 'cyan', attrs=['bold']))
     searchurl = requests.request("GET", f"{PIPEDAPI_URL}/search?q={query}&filter=music_songs", headers=headers).text.encode()
+    print(colored("Found results!", 'green', attrs=['bold']), end="\r")
+    time.sleep(0.5)
     searchjson = json.loads(searchurl)
+    print(colored("Loading results...", 'green', attrs=['bold']), end="\r")
+    time.sleep(0.5)
     return searchjson
 
 def getVideos(query):
-    print(colored("\nSearching for videos... \n", 'cyan', attrs=['bold']))
+    print(colored("\nSearching for videos...\n", 'cyan', attrs=['bold']))
     searchurl = requests.request("GET", f"{PIPEDAPI_URL}/search?q={query}&filter=videos", headers=headers).text.encode()
+    print(colored("Found results!", 'green', attrs=['bold']), end="\r")
+    time.sleep(0.5)
     searchjson = json.loads(searchurl)
+    print(colored("Loading results...", 'green', attrs=['bold']), end="\r")
+    time.sleep(0.5)
     return searchjson
 
 def getAlbums(query):
-    print(colored("\nSearching for albums... \n", 'cyan', attrs=['bold']))
+    print(colored("\nSearching for albums...\n", 'cyan', attrs=['bold']))
     searchurl = requests.request("GET", f"{PIPEDAPI_URL}/search?q={query}&filter=music_albums", headers=headers).text.encode()
+    print(colored("Found results!", 'green', attrs=['bold']), end="\r")
+    time.sleep(0.5)
     searchjson = json.loads(searchurl)
+    print(colored("Loading results...", 'green', attrs=['bold']), end="\r")
+    time.sleep(0.5)
     return searchjson
 
 def getPlaylists(query):
-    print(colored("\nSearching for playlists... \n", 'cyan', attrs=['bold']))
+    print(colored("\nSearching for playlists...\n", 'cyan', attrs=['bold']))
     searchurl = requests.request("GET", f"{PIPEDAPI_URL}/search?q={query}&filter=playlists", headers=headers).text.encode()
+    print(colored("Found results!", 'green', attrs=['bold']), end="\r")
+    time.sleep(0.5)
     searchjson = json.loads(searchurl)
+    print(colored("Loading results...", 'green', attrs=['bold']), end="\r")
+    time.sleep(0.5)
     return searchjson
     
 def playTracks(item_list, queue_list):
@@ -112,6 +128,7 @@ def playTracks(item_list, queue_list):
       return queueIsEmpty()
     queuemsg = print(colored("\nPlaying items in the queue", 'cyan', attrs=['bold']) + colored(' (q to quit)\n', 'red')) 
     show_queue = print(f"\n".join([f"{colored(i, 'green')}. {track} \n" for i, track in enumerate((item_list), start=1)]))     
+    print(colored("Launching MPV...", 'green', attrs=['bold']), end="\r")
     play_tracks = os.system(f"mpv --vo=null --cache=yes --video=no --no-video --term-osd-bar --no-resume-playback {' '.join(queue_list)} ")
     return queuemsg, show_queue, play_tracks
 
@@ -120,14 +137,17 @@ def playVideos(item_list, queue_list):
       return queueIsEmpty()
     queuemsg = print(colored("\nPlaying items in the queue", 'cyan', attrs=['bold']) + colored(' (q to quit)\n', 'red')) 
     show_queue = print(f"\n".join([f"{colored(i, 'green')}. {track} \n" for i, track in enumerate((item_list), start=1)]))     
+    print(colored("Launching MPV...", 'green', attrs=['bold']), end="\r")
     play_videos = os.system(f"mpv --cache=yes --term-osd-bar --no-resume-playback {' '.join(queue_list)} ")
     return queuemsg, show_queue, play_videos
 
 def playVideosURL(url):
+    print(colored("Launching MPV...", 'green', attrs=['bold']), end="\r")
     play_videos = os.system(f"mpv --cache=yes --term-osd-bar --no-resume-playback {url} ")
     return play_videos
 
 def playTracksURL(url):
+    print(colored("Launching MPV...", 'green', attrs=['bold']), end="\r")
     play_videos = os.system(f"mpv --vo=null --cache=yes --video=no --no-video --term-osd-bar --no-resume-playback {url} ")
     return play_videos
 
