@@ -70,17 +70,17 @@ def showQueue(item_list):
     if len(item_list) == 0:
       return queueIsEmpty()
     else:
-      show_queue = print(f"\n".join([f"\n{colored(i, 'green')}. {track}" for i, track in enumerate((item_list))]))     
+      show_queue = print(f"\n".join([f"\n{colored(i, 'green')}. {track}" for i, track in enumerate((item_list), start=1)]))     
       return show_queue
 
 def showResults(query, result):
     info = print(colored("Results for", 'red') + colored(f" {query}\n", 'cyan', attrs=['bold']))
-    lists = print(f"\n".join([f"{colored(i, 'green')}. {item['title']} - {item['uploaderName']} ({time.strftime('%M:%S',time.gmtime(item['duration']))})" for i, item in enumerate((result['items']), start=1)]))
+    lists = print(f"\n".join([f"{colored(i, 'green')}. {colored(item['title'], 'red', attrs=['bold'])} - {colored(item['uploaderName'], 'cyan', attrs=['bold'])} ({time.strftime('%M:%S',time.gmtime(item['duration']))})" for i, item in enumerate((result['items']), start=1)]))
     return info, lists
 
 def showResultsAlbumsPlaylists(query, result):
     info = print(colored("Results for", 'red') + colored(f" {query}\n", 'cyan', attrs=['bold']))
-    lists = print(f"\n".join([f"{colored(i, 'green')}. {item['name']} - {item['uploaderName']}" for i, item in enumerate((result['items']), start=1)]))
+    lists = print(f"\n".join([f"{colored(i, 'green')}. {colored(item['name'], 'red', attrs=['bold'])} - {colored(item['uploaderName'], 'cyan', attrs=['bold'])}" for i, item in enumerate((result['items']), start=1)]))
     return info, lists
 
 def getSongs(query):
@@ -111,7 +111,7 @@ def playTracks(item_list, queue_list):
     if len(item_list) == 0:
       return queueIsEmpty()
     queuemsg = print(colored("\nPlaying items in the queue", 'cyan', attrs=['bold']) + colored(' (q to quit)\n', 'red')) 
-    show_queue = print(f"\n".join([f"{colored(i, 'green')}. {track} \n" for i, track in enumerate((item_list))]))     
+    show_queue = print(f"\n".join([f"{colored(i, 'green')}. {track} \n" for i, track in enumerate((item_list), start=1)]))     
     play_tracks = os.system(f"mpv --vo=null --cache=yes --video=no --no-video --term-osd-bar --no-resume-playback {' '.join(queue_list)} ")
     return queuemsg, show_queue, play_tracks
 
@@ -119,7 +119,7 @@ def playVideos(item_list, queue_list):
     if len(item_list) == 0:
       return queueIsEmpty()
     queuemsg = print(colored("\nPlaying items in the queue", 'cyan', attrs=['bold']) + colored(' (q to quit)\n', 'red')) 
-    show_queue = print(f"\n".join([f"{colored(i, 'green')}. {track} \n" for i, track in enumerate((item_list))]))     
+    show_queue = print(f"\n".join([f"{colored(i, 'green')}. {track} \n" for i, track in enumerate((item_list), start=1)]))     
     play_videos = os.system(f"mpv --cache=yes --term-osd-bar --no-resume-playback {' '.join(queue_list)} ")
     return queuemsg, show_queue, play_videos
 
