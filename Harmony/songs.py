@@ -66,4 +66,4 @@ def pickTrack(json, song):
   videoid = json['items'][int(option) - 1]['url']
   title = colored(json['items'][int(option) - 1]['title'], 'red')
   author = colored(json['items'][int(option) - 1]['uploaderName'], 'cyan')
-  return functions.addItems(videoid, title, author), searchSongs()
+  return functions.addSongs(videoid, title, author), searchSongs()

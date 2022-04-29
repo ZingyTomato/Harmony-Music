@@ -129,7 +129,7 @@ def playTracks(item_list, queue_list):
     queuemsg = print(colored("\nPlaying items in the queue", 'cyan', attrs=['bold']) + colored(' (q to quit)\n', 'red')) 
     show_queue = print(f"\n".join([f"{colored(i, 'green')}. {track} \n" for i, track in enumerate((item_list), start=1)]))     
     print(colored("Launching MPV...", 'green', attrs=['bold']), end="\r")
-    play_tracks = os.system(f"mpv --vo=null --cache=yes --video=no --no-video --term-osd-bar --no-resume-playback {' '.join(queue_list)} ")
+    play_tracks = [os.system(f"mpv --vo=null --cache=yes --video=no --no-video --term-osd-bar --no-resume-playback '{track}' ") for track in queue_list]
     return queuemsg, show_queue, play_tracks
 
 def playVideos(item_list, queue_list):
@@ -150,6 +150,17 @@ def playTracksURL(url):
     print(colored("Launching MPV...", 'green', attrs=['bold']), end="\r")
     play_videos = os.system(f"mpv --vo=null --cache=yes --video=no --no-video --term-osd-bar --no-resume-playback {url} ")
     return play_videos
+
+def addSongs(videoid, title, author):
+    print(colored("\nGathering info...", 'green', attrs=['bold']), end="\r")
+    videoid = videoid.replace("/watch?v=", "")
+    searchurl = requests.request("GET", f"{PIPEDAPI_URL}/streams/{videoid}", headers=headers).text.encode()
+    searchjson = json.loads(searchurl)
+    streamurl = searchjson['audioStreams'][4]['url']
+    queue_list.append(streamurl)
+    item_list.append(f"{title} - {author}")
+    added = print(colored(f"{title} - ", 'cyan') + colored(f'{author}', 'red') + colored(" has been added to the queue.", 'green'))
+    return added
 
 def addItems(videoid, title, author):
     stream_url = f"{PIPED_URL}" + f"{videoid}"
