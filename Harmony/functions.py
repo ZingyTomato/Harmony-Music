@@ -7,10 +7,15 @@ import songs
 import videos
 import albums
 import playlists
+import re
 
 queue_list = []
 
 item_list = []
+
+audio_list = []
+
+title_list = []
 
 headers = {
   'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101 Firefox/91.0'
@@ -29,6 +34,8 @@ PIPED_URL = "https://piped.kavin.rocks"
 def emptyQueue():
     item_list.clear()
     queue_list.clear()
+    audio_list.clear()
+    title_list.clear()
 
 def youtubeLink():
     info = print(colored("Youtube URL detected, directly playing the link.", color='cyan', attrs=['bold'])  + colored(' (q to quit)\n', 'red'))
@@ -66,7 +73,11 @@ def queueIsEmpty():
     empty = print(colored("\nThe queue is empty!",'red', attrs=['bold']))
     return empty
 
-def showQueue(item_list):
+def fixTitle(title):
+    final_title = re.sub("[\"\']", "", title)
+    return final_title
+
+def showQueue():
     if len(item_list) == 0:
       return queueIsEmpty()
     else:
@@ -123,22 +134,22 @@ def getPlaylists(query):
     time.sleep(0.5)
     return searchjson
     
-def playTracks(item_list, queue_list):
+def playTracks():
     if len(item_list) == 0:
       return queueIsEmpty()
     queuemsg = print(colored("\nPlaying items in the queue", 'cyan', attrs=['bold']) + colored(' (q to quit)\n', 'red')) 
     show_queue = print(f"\n".join([f"{colored(i, 'green')}. {track} \n" for i, track in enumerate((item_list), start=1)]))     
     print(colored("Launching MPV...", 'green', attrs=['bold']), end="\r")
-    play_tracks = [os.system(f"mpv --vo=null --cache=yes --video=no --no-video --term-osd-bar --no-resume-playback '{track}' ") for track in queue_list]
+    play_tracks = [os.system(f"mpv --vo=null --cache=yes --video=no --no-video --term-osd-bar --term-playing-msg='{title}' --no-resume-playback '{track}' ") for track, title in zip(queue_list, item_list)]
     return queuemsg, show_queue, play_tracks
 
-def playVideos(item_list, queue_list):
+def playVideos():
     if len(item_list) == 0:
       return queueIsEmpty()
     queuemsg = print(colored("\nPlaying items in the queue", 'cyan', attrs=['bold']) + colored(' (q to quit)\n', 'red')) 
     show_queue = print(f"\n".join([f"{colored(i, 'green')}. {track} \n" for i, track in enumerate((item_list), start=1)]))     
     print(colored("Launching MPV...", 'green', attrs=['bold']), end="\r")
-    play_videos = os.system(f"mpv --cache=yes --term-osd-bar --no-resume-playback {' '.join(queue_list)} ")
+    play_videos = [os.system(f"mpv --cache=yes --term-osd-bar --no-resume-playback '{track}' --audio-file='{audio}' --force-media-title='{fixTitle(title)}' ") for track, audio, title in zip(queue_list, audio_list, title_list)]
     return queuemsg, show_queue, play_videos
 
 def playVideosURL(url):
@@ -158,14 +169,28 @@ def addSongs(videoid, title, author):
     searchjson = json.loads(searchurl)
     streamurl = searchjson['audioStreams'][4]['url']
     queue_list.append(streamurl)
-    item_list.append(f"{title} - {author}")
+    item_list.append(f"{colored(title, 'red')} - {colored(author, 'cyan')}")
+    added = print(colored(f"{title} - ", 'cyan') + colored(f'{author}', 'red') + colored(" has been added to the queue.", 'green'))
+    return added
+
+def addVideos(videoid, title, author):
+    print(colored("\nGathering info...", 'green', attrs=['bold']), end="\r")
+    videoid = videoid.replace("/watch?v=", "")
+    searchurl = requests.request("GET", f"{PIPEDAPI_URL}/streams/{videoid}", headers=headers).text.encode()
+    searchjson = json.loads(searchurl)
+    videourl = searchjson['videoStreams'][0]['url']
+    audiourl = searchjson['audioStreams'][0]['url']
+    queue_list.append(videourl)
+    audio_list.append(audiourl)
+    title_list.append(title)
+    item_list.append(f"{colored(title, 'red')} - {colored(author, 'cyan')}")
     added = print(colored(f"{title} - ", 'cyan') + colored(f'{author}', 'red') + colored(" has been added to the queue.", 'green'))
     return added
 
 def addItems(videoid, title, author):
     stream_url = f"{PIPED_URL}" + f"{videoid}"
     queue_list.append(stream_url)
-    item_list.append(f"{title} - {author}")
+    item_list.append(f"{colored(title, 'red')} - {colored(author, 'cyan')}")
     added = print(colored(f"\n{title} - ", 'cyan') + colored(f'{author}', 'red') + colored(" has been added to the queue.", 'green'))
     return added
 

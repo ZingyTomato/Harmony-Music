@@ -20,10 +20,10 @@ def searchPlaylists():
     return functions.emptyQueue(), functions.chooseOption()
       
   elif playlist == "p" or playlist == "P":
-    return functions.playTracks(functions.item_list, functions.queue_list), functions.emptyQueue(), searchPlaylists()
+    return functions.playTracks(), functions.emptyQueue(), searchPlaylists()
       
   elif playlist == "s" or playlist == "S":
-    return functions.showQueue(functions.item_list), searchPlaylists()
+    return functions.showQueue(), searchPlaylists()
       
   return listPlaylists(playlist)
   
@@ -55,6 +55,6 @@ def pickPlaylist(json, playlist):
     return functions.invalidRange(), pickPlaylist(json, playlist)
 
   videoid = json['items'][int(option) - 1]['url']
-  title = colored(json['items'][int(option) - 1]['name'], 'red')
-  author = colored(json['items'][int(option) - 1]['uploaderName'], 'cyan')
+  title = json['items'][int(option) - 1]['name']
+  author = json['items'][int(option) - 1]['uploaderName']
   return functions.addItems(videoid, title, author), searchPlaylists()

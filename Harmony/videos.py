@@ -26,10 +26,10 @@ def searchVideos():
     return functions.emptyQueue(), functions.chooseOption()
       
   elif video == "p" or video == "P":
-    return functions.playVideos(functions.item_list, functions.queue_list), functions.emptyQueue(), searchVideos()
+    return functions.playVideos(), functions.emptyQueue(), searchVideos()
       
   elif video == "s" or video == "S":
-    return functions.showQueue(functions.item_list), searchVideos()
+    return functions.showQueue(), searchVideos()
       
   return listVideos(video)
 
@@ -64,6 +64,6 @@ def pickVideo(json, video):
     return functions.invalidRange(), pickVideo(json, video)
       
   videoid = json['items'][int(option) - 1]['url']
-  title = colored(json['items'][int(option) - 1]['title'], 'red')
-  author = colored(json['items'][int(option) - 1]['uploaderName'], 'cyan')
-  return functions.addItems(videoid, title, author), searchVideos()
+  title = json['items'][int(option) - 1]['title']
+  author = json['items'][int(option) - 1]['uploaderName']
+  return functions.addVideos(videoid, title, author), searchVideos()

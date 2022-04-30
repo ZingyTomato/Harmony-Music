@@ -23,10 +23,10 @@ def searchAlbums():
     return functions.emptyQueue(), functions.chooseOption()
       
   elif album == "p" or album == "P":
-    return functions.playTracks(functions.item_list, functions.queue_list), functions.emptyQueue(), searchAlbums()
+    return functions.playTracks(), functions.emptyQueue(), searchAlbums()
       
   elif album == "s" or album == "S":
-    return functions.showQueue(functions.item_list), searchAlbums()
+    return functions.showQueue(), searchAlbums()
       
   return listAlbums(album)
   
@@ -58,6 +58,6 @@ def pickAlbum(json, album):
     return functions.invalidRange(), pickAlbum(json, album)
 
   videoid = json['items'][int(option) - 1]['url']
-  title = colored(json['items'][int(option) - 1]['name'], 'red')
-  author = colored(json['items'][int(option) - 1]['uploaderName'], 'cyan')
+  title = json['items'][int(option) - 1]['name']
+  author = json['items'][int(option) - 1]['uploaderName']
   return functions.addItems(videoid, title, author), searchAlbums()
