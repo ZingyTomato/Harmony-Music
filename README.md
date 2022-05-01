@@ -25,7 +25,7 @@ Harmony is a command line tool to stream music and videos without worrying about
 
 - [x] Minimal Resource Usage. (Around **1-2%** CPU usage while streaming music and **5-10%** while playing videos)
 - [x] No requests made to Youtube to fetch results.
-- [x] Avoid Youtube's georestrictions. Works only with the **--song** option for now.
+- [x] Avoid Youtube's georestrictions by using Piped's inbuilt proxy. Works with both the **--song** and **--video** flag.
 - [x] Ability to filter search queries by music, videos, albums or playlists.
 - [x] A proper queue system. 
 
