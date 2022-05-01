@@ -74,7 +74,7 @@ def queueIsEmpty():
     return empty
 
 def fixTitle(title):
-    final_title = re.sub("[\"\']", "", title)
+    final_title = re.sub("[\"\']", " ", title)
     return final_title
 
 def showQueue():
@@ -140,7 +140,7 @@ def playTracks():
     queuemsg = print(colored("\nPlaying items in the queue", 'cyan', attrs=['bold']) + colored(' (q to quit)\n', 'red')) 
     show_queue = print(f"\n".join([f"{colored(i, 'green')}. {track} \n" for i, track in enumerate((item_list), start=1)]))     
     print(colored("Launching MPV...", 'green', attrs=['bold']), end="\r")
-    play_tracks = [os.system(f"mpv --vo=null --cache=yes --video=no --no-video --term-osd-bar --term-playing-msg='{title}' --no-resume-playback '{track}' ") for track, title in zip(queue_list, item_list)]
+    play_tracks = [os.system(f"mpv --vo=null --cache=yes --video=no --no-video --term-osd-bar --term-playing-msg='{fixTitle(title)}' --no-resume-playback '{track}' ") for track, title in zip(queue_list, item_list)]
     return queuemsg, show_queue, play_tracks
 
 def playVideos():
