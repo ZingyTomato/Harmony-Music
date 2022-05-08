@@ -49,6 +49,12 @@ script-opts-append=ytdl_hook-ytdl_path=yt-dlp
 
 ## 💻 Installation
 
+Harmony is available in the AUR. You can find it [`here`](https://aur.archlinux.org/packages/harmony).
+
+```
+yay -S harmony
+```
+
 Simply download the release binary from the [`releases section`](https://github.com/ZingyTomato/harmonymusic/releases) or enter the following commands below in any Linux terminal. (No windows binaries yet!)
 
 ```
