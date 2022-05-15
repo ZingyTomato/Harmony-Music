@@ -13,7 +13,6 @@
 * [`❔ What's this?`](#-whats-this)
 * [`🎧 Features`](#-features)
 * [`📜 Requirements`](#-requirements)
-* [`🛑 Force mpv to use yt-dlp over youtube-dl`](#-force-mpv-to-use-yt-dlp-over-youtube-dl)
 * [`💻 Installation`](#-installation)
 * [`👨‍🔧 Usage`](#-usage)
 
@@ -33,20 +32,6 @@ Harmony is a command line tool to stream music and videos without worrying about
 
 1. [`mpv`](https://mpv.io) - An open source command line video player.
 
-2. [`yt-dlp`](https://github.com/yt-dlp/yt-dlp) - A youtube-dl fork with additional features and fixes. This is preferred over youtube-dl for a better experience.
-
-## 🛑 Force mpv to use yt-dlp over youtube-dl
-
-yt-dlp is suggested over youtube-dl as it tends to load videos, music etc. quicker and more importantly works with the **--playlist** flag.
-
-The recommended way to solve this issue is to just uninstall `youtube-dl` and install `yt-dlp` instead.
-
-However, if you would like to have both `youtube-dl` and `yt-dlp` installed on your system, add this line to `~/.config/MPV/mpv.conf`
-
-```
-script-opts-append=ytdl_hook-ytdl_path=yt-dlp
-```
-
 ## 💻 Installation
 
 Harmony is available in the AUR. You can find it [`here`](https://aur.archlinux.org/packages/harmony).
@@ -65,13 +50,13 @@ sudo chmod a+rx /usr/local/bin/harmony
 ## 👨‍🔧 Usage
 
 ```
-  -h, --help           show this help message and exit
-  --song, -s, --s      Searches for songs based on query. Example: harmony
-                       --song "Never gonna give you up"
-  --video, -v, --v     Searches for videos based on the query. Example:
-                       harmony --video "Never gonna give you up"
-  --album, -a, --a     Searches for albums based on the query. Example:
-                       harmony --album "All Over The Place"
-  --playlist, -p, --p  Searches for playlists based on the query. Example:
-                       harmony --playlist "All Over The Place"
+usage: harmony.py [-h] [SONG_NAME ...]
+
+An open souce video/music streamer based on MPV and piped.
+
+positional arguments:
+  SONG_NAME   Searches for songs based on the query. Example: harmony 2step Ed Sheeran
+
+options:
+  -h, --help  show this help message and exit
 ```
