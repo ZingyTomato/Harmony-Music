@@ -1,6 +1,7 @@
 import argparse
 import songs
 import functions
+import termcolor
 
 parser = argparse.ArgumentParser(description="An open souce video/music streamer based on MPV and piped.")
 
