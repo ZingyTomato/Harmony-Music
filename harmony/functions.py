@@ -16,9 +16,7 @@ YOUTUBE_REGEX = r"http(?:s?):\/\/(?:www\.)?youtu(?:be\.com\/watch\?v=|\.be\/)([\
 
 URL_REGEX = r"(http|ftp|https):\/\/([\w\-_]+(?:(?:\.[\w\-_]+)+))([\w\-\.,@?^=%&:/~\+#]*[\w\-\@?^=%&/~\+#])?"
 
-PIPEDAPI_URL = "https://pipedapi.kavin.rocks"
-
-PIPED_URL = "https://piped.kavin.rocks"
+SEARCH_URL = "https://saavn.me"
 
 def emptyQueue():
     item_list.clear()
@@ -65,14 +63,14 @@ def showQueue():
 
 def showResults(query, result):
     info = print(colored("Results for", 'red') + colored(f" {query}\n", 'cyan', attrs=['bold']))
-    lists = print(f"\n".join([f"{colored(i, 'green')}. {colored(item['title'], 'red', attrs=['bold'])} - {colored(item['uploaderName'], 'cyan', attrs=['bold'])} ({time.strftime('%M:%S',time.gmtime(item['duration']))})" for i, item in enumerate((result['items']), start=1)]))
+    lists = print(f"\n".join([f"{colored(i, 'green')}. {colored(item['name'], 'red', attrs=['bold'])} - {colored(item['artist'], 'cyan', attrs=['bold'])} ({time.strftime('%M:%S',time.gmtime(int(item['duration'])))})" for i, item in enumerate((result['results']), start=1)]))
     return songs.pickTrack(query, result)
 
 def getSongs(query):
     print(colored("\nSearching for songs...", 'cyan', attrs=['bold']))
-    searchurl = requests.request("GET", f"{PIPEDAPI_URL}/search?q={query}&filter=music_songs", headers=headers).text.encode()
+    searchurl = requests.request("GET", f"{SEARCH_URL}/search/songs?query={query}&page=1&limit=20", headers=headers).text.encode()
     searchjson = json.loads(searchurl)
-    if len(searchjson['items']) == 0:
+    if len(searchjson['results']) == 0:
         return noResults(query)
     print(colored("\nFound results!", 'green', attrs=['bold']), end="\r")
     time.sleep(0.5)
@@ -95,12 +93,7 @@ def playTracksURL(url):
     return songs.searchSongs()
 
 def addSongs(videoid, title, author):
-    print(colored("\nGathering info...", 'green', attrs=['bold']), end="\r")
-    videoid = videoid.replace("/watch?v=", "")
-    searchurl = requests.request("GET", f"{PIPEDAPI_URL}/streams/{videoid}", headers=headers).text.encode()
-    searchjson = json.loads(searchurl)
-    streamurl = searchjson['audioStreams'][4]['url']
-    queue_list.append(streamurl)
+    queue_list.append(videoid)
     item_list.append(f"{colored(title, 'red')} - {colored(author, 'cyan')}")
     added = print(colored(f"{title} - ", 'cyan') + colored(f'{author}', 'red') + colored(" has been added to the queue.", 'green'))
     return added, songs.searchSongs()

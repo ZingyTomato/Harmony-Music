@@ -40,7 +40,7 @@ def listTracks(song):
 
 def pickTrack(song, json):
 
-  item_length = len(json['items'])
+  item_length = len(json['results'])
   
   option = input(colored("\nPick an option", 'cyan', attrs=['bold']) + colored(f" [1:{item_length}, (B)ack, (Q)uit]: ", 'red'))
 
@@ -56,7 +56,7 @@ def pickTrack(song, json):
   if int(option) > item_length or int(option) < 1:
     return functions.invalidRange(), pickTrack(song, json)
 
-  videoid = json['items'][int(option) - 1]['url']
-  title = json['items'][int(option) - 1]['title']
-  author = json['items'][int(option) - 1]['uploaderName']
+  videoid = json['results'][int(option) - 1]['downloadUrl'][4]['link']
+  title = json['results'][int(option) - 1]['name']
+  author = json['results'][int(option) - 1]['artist']
   return functions.addSongs(videoid, title, author)

@@ -1,6 +1,6 @@
 <div align="center">
 <h1>🎶 Harmony Music</h1>
-<h4>An easy way to stream videos or music from Youtube from the command line while regaining your privacy.</h4>
+<h4>An easy way to stream music from online sources from the command line while regaining your privacy.</h4>
 </div>
 
 <div align="center" width="60%" height="auto">
@@ -18,14 +18,13 @@
 
 ## ❔ What's this?
 
-Harmony is a command line tool to stream music and videos without worrying about prying eyes from the likes of Youtube. Instead of directly scraping Youtube, Harmony uses [`Piped`](https://github.com/TeamPiped/Piped) instead. This results in not only quicker fetching of results but also prevents Youtube from seeing your IP by proxying videos, all from the comfort of the terminal. 
-
+Harmony is a command line tool to stream music from the command line without worrying about tracking/profiling. Harmony uses a [`Jiosaavn API`](https://github.com/sumitkolhe/jiosaavn-api) to both fetch results and stream music. 
+ 
 ## 🎧 Features
 
-- [x] Minimal Resource Usage. (Around **1-2%** CPU usage while streaming music and **5-10%** while playing videos)
-- [x] No requests made to Youtube to fetch results.
-- [x] Avoid Youtube's georestrictions by using Piped's inbuilt proxy. Works with both the **--song** and **--video** flag.
-- [x] Ability to filter search queries by music, videos, albums or playlists.
+- [x] Minimal Resource Usage. (Around **1-2%** CPU usage while streaming music)
+- [x] No tracking whatsoever.
+- [x] High quality audio streaming. Specifically, **320kbps**
 - [x] A proper queue system. 
 
 ## 📜 Requirements
