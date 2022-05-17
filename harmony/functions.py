@@ -95,5 +95,5 @@ def playTracksURL(url):
 def addSongs(videoid, title, author):
     queue_list.append(videoid)
     item_list.append(f"{colored(title, 'red')} - {colored(author, 'cyan')}")
-    added = print(colored(f"{title} - ", 'cyan') + colored(f'{author}', 'red') + colored(" has been added to the queue.", 'green'))
+    added = print(colored(f"\n{title} - ", 'cyan') + colored(f'{author}', 'red') + colored(" has been added to the queue.", 'green'))
     return added, songs.searchSongs()
