@@ -3,38 +3,42 @@ import json
 import re
 from termcolor import colored
 import functions
+import os
 
 def searchSongs():
 
   song = input(colored("\nAdd songs to the Queue ", 'cyan', attrs=['bold']) + colored("(P)lay, (S)how Queue, (Q)uit: ", 'red'))
 
   if re.match(functions.YOUTUBE_REGEX, song):
-    return functions.youtubeLink(song)
+    return functions.youtubeLink(), functions.playTracksURL(song)
 
   elif re.match(functions.URL_REGEX, song):
-    return functions.urlLink(song)
+    return functions.urlLink(), functions.playTracksURL(song)
 
   if song.isnumeric() == True:
     return functions.invalidInput(), searchSongs()
     
+  if song == "":
+    return functions.emptyInput(), searchSongs()
+
   elif song == "q" or song == "Q":
-    return functions.exitProgram()
+    return functions.removeSubs(), functions.exitProgram()
       
   elif song == "p" or song == "P":
-    return functions.playTracks()
+    return functions.playTracks(), searchSongs()
       
   elif song == "s" or song == "S":
-    return functions.showQueue()
+    return functions.showQueue(), searchSongs()
       
   return listTracks(song)
   
 def listTracks(song):
   
   if re.match(functions.YOUTUBE_REGEX, song):
-    return functions.youtubeLink(song)
+    return functions.youtubeLink(), functions.playTracksURL(song)
 
   elif re.match(functions.URL_REGEX, song):
-    return functions.urlLink(song)
+    return functions.urlLink(), functions.playTracksURL(song)
     
   return functions.getSongs(song)
 
@@ -48,10 +52,10 @@ def pickTrack(song, json):
     return functions.invalidInput(), pickTrack(song, json)
     
   elif option == "b" or option == "B":
-    return searchSongs()
+    return functions.removeSubs() , searchSongs()
 
   elif option == "q" or option == "Q":
-    return functions.exitProgram()
+    return functions.removeSubs(), functions.exitProgram()
 
   if int(option) > item_length or int(option) < 1:
     return functions.invalidRange(), pickTrack(song, json)

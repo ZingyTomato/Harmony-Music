@@ -1,6 +1,6 @@
 <div align="center">
 <h1>🎶 Harmony Music</h1>
-<h4>An easy way to stream music from online sources from the command line while regaining your privacy.</h4>
+<h4>An easy way to stream music or videos from online sources like Youtube from the command line while regaining your privacy.</h4>
 </div>
 
 <div align="center" width="60%" height="auto">
@@ -18,13 +18,14 @@
 
 ## ❔ What's this?
 
-Harmony is a command line tool to stream music from the command line without worrying about tracking/profiling. Harmony uses a [`Jiosaavn API`](https://github.com/sumitkolhe/jiosaavn-api) to both fetch results and stream music. 
+Harmony is a command line tool to stream music from the command line without worrying about tracking/profiling. Harmony uses a [`Jiosaavn API`](https://github.com/sumitkolhe/jiosaavn-api) to both fetch results and stream music. ['Piped'](https://github.com/TeamPiped/Piped) is used to both fetch videos and stream videos.
  
 ## 🎧 Features
 
-- [x] Minimal Resource Usage. (Around **1-2%** CPU usage while streaming music)
-- [x] No tracking whatsoever.
-- [x] High quality audio streaming. Specifically, **320kbps**
+- [x] Minimal Resource Usage. (Around **1-2%** CPU usage while streaming music, **5-10%** CPU usage while streaming videos.)
+- [x] No tracking whatsoever either while streaming music or videos.
+- [x] High quality audio streaming (**320kbps**) and video streaming (Picks the highest quality Audio and Video from Piped)
+- [x] Support for real-time synced lyrics. (Works with most songs)
 - [x] A proper queue system. 
 
 ## 📜 Requirements
@@ -49,13 +50,14 @@ sudo chmod a+rx /usr/local/bin/harmony
 ## 👨‍🔧 Usage
 
 ```
-usage: harmony.py [-h] [SONG_NAME ...]
+usage: harmony [-h] [-v] [SEARCH_QUERY ...]
 
-An open souce video/music streamer based on MPV and piped.
+An open souce CLI music/video streamer based on MPV.
 
 positional arguments:
-  SONG_NAME   Searches for songs based on the query. Example: harmony 2step Ed Sheeran
+  SEARCH_QUERY  Name of the song/video to search for. Example: harmony 2step Ed Sheeran
 
 options:
-  -h, --help  show this help message and exit
+  -h, --help    show this help message and exit
+  -v, --video   Allows to search for videos instead of music. Example harmony -v 2step Ed Sheeran
 ```
