@@ -18,13 +18,13 @@
 
 ## ❔ What's this?
 
-Harmony is a command line tool to stream music from the command line without worrying about tracking/profiling. Harmony uses a [`Jiosaavn API`](https://github.com/sumitkolhe/jiosaavn-api) to both fetch results and stream music. ['Piped'](https://github.com/TeamPiped/Piped) is used to both fetch videos and stream videos.
+Harmony is a command line tool to stream music from the command line without worrying about tracking/profiling. Harmony uses a [`Jiosaavn API`](https://github.com/sumitkolhe/jiosaavn-api) to both fetch results and stream music. [`Piped`](https://github.com/TeamPiped/Piped) is used to both fetch videos and stream videos.
  
 ## 🎧 Features
 
 - [x] Minimal Resource Usage. (Around **1-2%** CPU usage while streaming music, **5-10%** CPU usage while streaming videos.)
 - [x] No tracking whatsoever either while streaming music or videos.
-- [x] High quality audio streaming (**320kbps**) and video streaming (Picks the highest quality Audio and Video from Piped)
+- [x] High quality audio streaming (**320kbps**) and video streaming (Picks the highest quality audio and video from Piped)
 - [x] Support for real-time synced lyrics. (Works with most songs)
 - [x] A proper queue system. 
 
