@@ -60,6 +60,9 @@ def pickTrack(song, json):
   if int(option) > item_length or int(option) < 1:
     return functions.invalidRange(), pickTrack(song, json)
 
+  if json['results'][int(option) - 1]['downloadUrl'] == False:
+   return functions.noStreamUrl(), searchSongs()
+
   videoid = json['results'][int(option) - 1]['downloadUrl'][4]['link']
   title = json['results'][int(option) - 1]['name']
   author = json['results'][int(option) - 1]['artist']

@@ -62,6 +62,10 @@ def noResults(result):
     info = print(colored(f"\nUnable to find any results for {colored(result, 'cyan')}!", 'red', attrs=['bold']))
     return 
 
+def noStreamUrl():
+    info = print(colored(f"\nUnable to find any a stream URL!", 'red', attrs=['bold']))
+    return 
+
 def invalidRange():
     exitmsg = print(colored("\nInteger out of range!", 'red', attrs=['bold']))
     return 
@@ -96,7 +100,7 @@ def showResultsVideos(query, result):
     return videos.pickVideo(query, result)
 
 def forceQuit(signum, frame):
-    print(colored("\nForce quit by User.", 'red', attrs=['bold']))
+    print(colored("\nForce quit by user.", 'red', attrs=['bold']))
     removeSubs()
     return sys.exit(1)  
 
@@ -139,7 +143,7 @@ def playTracks():
     print(colored("Launching MPV and searching for Lyrics...", 'green', attrs=['bold']), end="\r")
     for track, title, author in zip(queue_list, title_list, author_list):
         lyricsToVtt(f"{title} - {author}")
-        os.system(f"mpv --vo=null --cache=yes --video=no --no-video --term-osd-bar --term-playing-msg='{fixTitle(colored(title, 'red'))} - {fixTitle(colored(author, 'cyan'))}' --no-resume-playback '{track}' {SUB_FILE} ")
+        os.system(f"mpv --vo=null --term-osd-bar --video=no --no-video --term-playing-msg='{fixTitle(colored(title, 'red'))} - {fixTitle(colored(author, 'cyan'))}' --no-resume-playback '{track}' {SUB_FILE} ")
         removeSubs()
     return emptyQueue(), removeSubs(), songs.searchSongs()
 
@@ -149,17 +153,17 @@ def playVideos():
     queuemsg = print(colored("\nPlaying videos in the Queue", 'cyan', attrs=['bold']) + colored(' (Q)uit, (L)oop\n', 'red')) 
     show_queue = print(f"\n".join([f"{colored(i, 'green')}. {track} \n" for i, track in enumerate((item_list), start=1)]))     
     print(colored("Launching MPV...", 'green', attrs=['bold']), end="\r")
-    play_videos = [os.system(f"mpv --cache=yes --term-osd-bar --no-resume-playback '{track}' --audio-file='{audio}' --force-media-title='{fixTitle(title)}'") for track, audio, title in zip(queue_list, audio_list, title_list)]
+    play_videos = [os.system(f"mpv --term-osd-bar --no-resume-playback '{track}' --audio-file='{audio}' --force-media-title='{fixTitle(title)}'") for track, audio, title in zip(queue_list, audio_list, title_list)]
     return emptyQueue(), videos.searchVideos()
 
 def playTracksURL(url):
     print(colored("Launching MPV...", 'green', attrs=['bold']), end="\r")
-    play_videos = os.system(f"mpv --vo=null --cache=yes --video=no --no-video --term-osd-bar --no-resume-playback {url} ")
+    play_videos = os.system(f"mpv --vo=null --video=no --no-video --term-osd-bar --no-resume-playback {url} ")
     return songs.searchSongs()
 
 def playVideosURL(url):
     print(colored("Launching MPV...", 'green', attrs=['bold']), end="\r")
-    play_videos = os.system(f"mpv --cache=yes --no-resume-playback {url} ")
+    play_videos = os.system(f"mpv --no-resume-playback {url} ")
     return videos.searchVideos()
 
 def addSongs(videoid, title, author):
