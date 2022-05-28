@@ -10,6 +10,7 @@ on:
     branches: [ main ]
     paths:
       - harmony/**
+  workflow_dispatch:
 
 jobs:
   build:
