@@ -16,8 +16,8 @@ jobs:
       with:
         python-version: 3.7
 
-    - run: pip install -r /harmony/requirements.txt pyinstaller
-    - run: pyinstaller --onefile /harmony/harmony.py
+    - run: pip install -r ./harmony/requirements.txt pyinstaller
+    - run: pyinstaller --onefile ./harmony/harmony.py
     # Optionally verify that it works (provided that it does not need user interaction)
     - uses: actions/upload-artifact@v2
       with:
