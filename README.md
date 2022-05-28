@@ -15,6 +15,7 @@
 * [`📜 Requirements`](#-requirements)
 * [`💻 Installation`](#-installation)
 * [`👨‍🔧 Usage`](#-usage)
+* [`🏥 Contributing`](#-contributing)
 
 ## ❔ What's this?
 
@@ -22,7 +23,7 @@ Harmony is a command line tool to stream music from the command line without wor
  
 ## 🎧 Features
 
-- [x] Minimal Resource Usage. **1-5%** CPU usage while streaming music, **5-15%** CPU usage while streaming videos
+- [x] Minimal Resource Usage. **1-5%** CPU usage while streaming music, **5-15%** CPU usage while streaming videos.
 - [x] No tracking whatsoever either while streaming music or videos.
 - [x] Streams **320 kbps** audio and streams the **highest** quality video.
 - [x] Support for real-time synced lyrics.
@@ -61,3 +62,7 @@ options:
   -h, --help    show this help message and exit
   -v, --video   Allows to search for videos instead of music. Example harmony -v 2step Ed Sheeran
 ```
+
+## 🏥 Contributing
+
+Feel free to create an issue if you encounter any bugs or would like to suggest something!
