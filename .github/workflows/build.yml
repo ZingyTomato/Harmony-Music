@@ -1,31 +1,24 @@
-
-name: Build Binary
-
 on:
   push:
-    branches: [ main ]
-    paths:
-      - harmony/**
-  pull_request:
-    branches: [ main ]
-    paths:
-      - harmony/**
   workflow_dispatch:
 
 jobs:
   build:
-
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['windows-latest', 'ubuntu-latest', 'macos-latest']
 
     steps:
     - uses: actions/checkout@v2
-
-    - name: Build Application
-      uses: JackMcKew/pyinstaller-action-linux@main
+    - uses: actions/setup-python@v2
       with:
-        path: harmony
+        python-version: 3.7
 
+    - run: pip install -r requirements.txt pyinstaller
+    - run: pyinstaller --onefile harmony.py
+    # Optionally verify that it works (provided that it does not need user interaction)
     - uses: actions/upload-artifact@v2
       with:
-        name: harmony
-        path: harmony
+        path: harmony/*
