@@ -20,7 +20,7 @@ jobs:
     - run: cd build
     - run: pip install -r ./harmony/requirements.txt pyinstaller
     - run: pyinstaller --onefile ./harmony/harmony.py
-    # Optionally verify that it works (provided that it does not need user interaction)
     - uses: actions/upload-artifact@v2
       with:
+        name: harmony-binaries
         path: dist
