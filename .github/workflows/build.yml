@@ -3,9 +3,13 @@ name: Build Binary
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
+    paths:
+      - harmony/**
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
+    paths:
+      - harmony/**
 
 jobs:
   build:
