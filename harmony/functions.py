@@ -74,9 +74,11 @@ def queueIsEmpty():
     empty = print(colored("\nThe queue is empty!",'red', attrs=['bold']))
     return 
 
-def fixTitle(title):
-    final_title = re.sub("[\"\']", " ", title)
-    return final_title
+def fixFormatting(text):
+    for r in ("&amp;", "&"):
+      text_1 = text.replace(*r)
+      final_text = re.sub("[\"\']", " ", text_1)
+      return final_text
 
 def emptyInput():
     print(colored("\nPlease enter the name of a song!", 'red', attrs=['bold']))
@@ -86,17 +88,17 @@ def showQueue():
     if len(item_list) == 0:
       return queueIsEmpty()
     else:
-      show_queue = print(f"\n".join([f"\n{colored(i, 'green')}. {track}" for i, track in enumerate((item_list), start=1)]))     
+      show_queue = print(f"\ns".join([f"\n{colored(i, 'green')}. {fixFormatting(track)}" for i, track in enumerate((item_list), start=1)]))     
       return 
 
 def showResults(query, result):
     info = print(colored("Results for", 'red') + colored(f" {query}\n", 'cyan', attrs=['bold']))
-    lists = print(f"\n".join([f"{colored(i, 'green')}. {colored(item['name'], 'red', attrs=['bold'])} - {colored(item['artist'], 'cyan', attrs=['bold'])} ({time.strftime('%M:%S',time.gmtime(int(item['duration'])))})" for i, item in enumerate((result['results']), start=1)]))
+    lists = print(f"\n".join([f"{colored(i, 'green')}. {colored(fixFormatting(item['name']), 'red', attrs=['bold'])} - {colored(fixFormatting(item['artist']), 'cyan', attrs=['bold'])} ({time.strftime('%M:%S',time.gmtime(int(item['duration'])))})" for i, item in enumerate((result['results']), start=1)]))
     return songs.pickTrack(query, result)
 
 def showResultsVideos(query, result):
     info = print(colored("Results for", 'red') + colored(f" {query}\n", 'cyan', attrs=['bold']))
-    lists = print(f"\n".join([f"{colored(i, 'green')}. {colored(item['title'], 'red', attrs=['bold'])} - {colored(item['uploaderName'], 'cyan', attrs=['bold'])} ({time.strftime('%M:%S',time.gmtime(item['duration']))})" for i, item in enumerate((result['items']), start=1)]))
+    lists = print(f"\n".join([f"{colored(i, 'green')}. {colored(fixFormatting(item['title']), 'red', attrs=['bold'])} - {colored(fixFormatting(item['uploaderName']), 'cyan', attrs=['bold'])} ({time.strftime('%M:%S',time.gmtime(item['duration']))})" for i, item in enumerate((result['items']), start=1)]))
     return videos.pickVideo(query, result)
 
 def forceQuit(signum, frame):
@@ -139,11 +141,11 @@ def playTracks():
     if len(item_list) == 0:
       return queueIsEmpty()
     queuemsg = print(colored("\nPlaying songs in the Queue", 'cyan', attrs=['bold']) + colored(' (Q)uit, (L)oop, (J) Disable Lyrics\n', 'red')) 
-    show_queue = print(f"\n".join([f"{colored(i, 'green')}. {track} \n" for i, track in enumerate((item_list), start=1)]))     
+    show_queue = print(f"\n".join([f"{colored(i, 'green')}. {fixFormatting(track)} \n" for i, track in enumerate((item_list), start=1)]))     
     print(colored("Launching MPV and searching for Lyrics...", 'green', attrs=['bold']), end="\r")
     for track, title, author in zip(queue_list, title_list, author_list):
         lyricsToVtt(f"{title} - {author}")
-        os.system(f"mpv --vo=null --term-osd-bar --video=no --no-video --term-playing-msg='{fixTitle(colored(title, 'red'))} - {fixTitle(colored(author, 'cyan'))}' --no-resume-playback '{track}' {SUB_FILE} ")
+        os.system(f"mpv --vo=null --term-osd-bar --video=no --no-video --term-playing-msg='{fixFormatting(colored(title, 'red'))} - {fixFormatting(colored(author, 'cyan'))}' --no-resume-playback '{track}' {SUB_FILE} ")
         removeSubs()
     return emptyQueue(), removeSubs(), songs.searchSongs()
 
@@ -151,9 +153,9 @@ def playVideos():
     if len(item_list) == 0:
       return queueIsEmpty()
     queuemsg = print(colored("\nPlaying videos in the Queue", 'cyan', attrs=['bold']) + colored(' (Q)uit, (L)oop\n', 'red')) 
-    show_queue = print(f"\n".join([f"{colored(i, 'green')}. {track} \n" for i, track in enumerate((item_list), start=1)]))     
+    show_queue = print(f"\n".join([f"{colored(i, 'green')}. {fixFormatting(track)} \n" for i, track in enumerate((item_list), start=1)]))     
     print(colored("Launching MPV...", 'green', attrs=['bold']), end="\r")
-    play_videos = [os.system(f"mpv --term-osd-bar --no-resume-playback '{track}' --audio-file='{audio}' --force-media-title='{fixTitle(title)}'") for track, audio, title in zip(queue_list, audio_list, title_list)]
+    play_videos = [os.system(f"mpv --term-osd-bar --no-resume-playback '{track}' --audio-file='{audio}' --force-media-title='{fixFormatting(title)}'") for track, audio, title in zip(queue_list, audio_list, title_list)]
     return emptyQueue(), videos.searchVideos()
 
 def playTracksURL(url):
@@ -172,7 +174,7 @@ def addSongs(videoid, title, author):
     title_list.append(title)
     author_list.append(author)
     item_list.append(f"{colored(title, 'red')} - {colored(author, 'cyan')}")
-    added = print(colored(f"{title} - ", 'cyan') + colored(f'{author}', 'red') + colored(" has been added to the queue.", 'green'))
+    added = print(colored(f"{fixFormatting(title)} - ", 'cyan') + colored(f"{fixFormatting(author)}", 'red') + colored(" has been added to the queue.", 'green'))
     return songs.searchSongs()
 
 def addVideos(videoid, title, author):
@@ -186,7 +188,7 @@ def addVideos(videoid, title, author):
     audio_list.append(audiourl)
     title_list.append(title)
     item_list.append(f"{colored(title, 'red')} - {colored(author, 'cyan')}")
-    added = print(colored(f"{title} - ", 'cyan') + colored(f'{author}', 'red') + colored(" has been added to the queue.", 'green'))
+    added = print(colored(f"{fixFormatting(title)} - ", 'cyan') + colored(f'{fixFormatting(author)}', 'red') + colored(" has been added to the queue.", 'green'))
     return videos.searchVideos()
 
 def parseTime(s):
@@ -195,7 +197,7 @@ def parseTime(s):
 def lyricsToVtt(query):
     global SUB_FILE
     try:
-      data = requests.request("GET", f"{LYRICS_API}/lyrics?q={query}", headers=headers).text.encode()
+      data = requests.request("GET", f"{LYRICS_API}/lyrics?q={fixFormatting(query)}", headers=headers).text.encode()
       data = json.loads(data)
       SUB_FILE = "--sub-file=subs.vtt"
     except:
