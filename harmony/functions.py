@@ -8,6 +8,7 @@ import videos
 import re
 import sys
 import signal
+import html
 
 queue_list = []
 
@@ -75,9 +76,8 @@ def queueIsEmpty():
     return 
 
 def fixFormatting(text):
-    for r in (("&amp;", "&"), ("&quot;", "'")):
-      text_1 = text.replace(*r)
-      final_text = re.sub("[\"\']", " ", text_1)
+      inital_text = html.unescape(f'{text}')
+      final_text = re.sub("[\"\']", " ", inital_text)
       return final_text
 
 def emptyInput():
@@ -145,7 +145,7 @@ def playTracks():
     print(colored("Launching MPV and searching for Lyrics...", 'green', attrs=['bold']), end="\r")
     for track, title, author in zip(queue_list, title_list, author_list):
         lyricsToVtt(f"{title} - {author}")
-        os.system(f"mpv --vo=null --term-osd-bar --video=no --no-video --term-playing-msg='{fixFormatting(colored(title, 'red'))} - {fixFormatting(colored(author, 'cyan'))}' --no-resume-playback '{track}' {SUB_FILE} ")
+        os.system(f"mpv --no-video --term-osd-bar --no-resume-playback --term-playing-msg='{fixFormatting(colored(title, 'red'))} - {fixFormatting(colored(author, 'cyan'))}' '{track}' {SUB_FILE} ")
         removeSubs()
     return emptyQueue(), removeSubs(), songs.searchSongs()
 
@@ -160,7 +160,7 @@ def playVideos():
 
 def playTracksURL(url):
     print(colored("Launching MPV...", 'green', attrs=['bold']), end="\r")
-    play_videos = os.system(f"mpv --vo=null --video=no --no-video --term-osd-bar --no-resume-playback {url} ")
+    play_videos = os.system(f"mpv --no-video --term-osd-bar --no-resume-playback {url} ")
     return songs.searchSongs()
 
 def playVideosURL(url):
