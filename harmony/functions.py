@@ -75,7 +75,7 @@ def queueIsEmpty():
     return 
 
 def fixFormatting(text):
-    for r in ("&amp;", "&"):
+    for r in (("&amp;", "&"), ("&quot;", "'")):
       text_1 = text.replace(*r)
       final_text = re.sub("[\"\']", " ", text_1)
       return final_text
