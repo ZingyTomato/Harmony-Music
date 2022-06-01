@@ -4,6 +4,7 @@ import re
 from termcolor import colored
 import functions
 import os
+import time
 
 def searchSongs():
 
@@ -65,5 +66,8 @@ def pickTrack(song, json):
 
   videoid = json['results'][int(option) - 1]['downloadUrl'][4]['link']
   title = json['results'][int(option) - 1]['name']
-  author = json['results'][int(option) - 1]['artist']
-  return functions.addSongs(videoid, title, author)
+  author = json['results'][int(option) - 1]['primaryArtists']
+  duration = time.strftime('%M:%S',time.gmtime(int(json['results'][int(option) - 1]['duration'])))
+  explicit = functions.isExplicit(json['results'][int(option) - 1]['explicitContent'])
+  
+  return functions.addSongs(videoid, title, author, duration, explicit)

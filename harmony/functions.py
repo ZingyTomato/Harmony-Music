@@ -77,8 +77,15 @@ def queueIsEmpty():
 
 def fixFormatting(text):
       inital_text = html.unescape(f'{text}')
-      final_text = re.sub("[\"\']", " ", inital_text)
+      final_text = re.sub("[\"\']", "", inital_text)
       return final_text
+
+def isExplicit(value):
+    if value == 1:
+        explicit = colored("🅴", 'green')
+        return explicit
+    else:
+        return ""
 
 def emptyInput():
     print(colored("\nPlease enter the name of a song!", 'red', attrs=['bold']))
@@ -93,7 +100,7 @@ def showQueue():
 
 def showResults(query, result):
     info = print(colored("Results for", 'red') + colored(f" {query}\n", 'cyan', attrs=['bold']))
-    lists = print(f"\n".join([f"{colored(i, 'green')}. {colored(fixFormatting(item['name']), 'red', attrs=['bold'])} - {colored(fixFormatting(item['artist']), 'cyan', attrs=['bold'])} ({time.strftime('%M:%S',time.gmtime(int(item['duration'])))})" for i, item in enumerate((result['results']), start=1)]))
+    lists = print(f"\n".join([f"{colored(i, 'green')}. {colored(fixFormatting(item['name']), 'red', attrs=['bold'])} - {colored(fixFormatting(item['primaryArtists']), 'cyan', attrs=['bold'])} ({time.strftime('%M:%S',time.gmtime(int(item['duration'])))}) {isExplicit(int(item['explicitContent']))}" for i, item in enumerate((result['results']), start=1)]))
     return songs.pickTrack(query, result)
 
 def showResultsVideos(query, result):
@@ -168,12 +175,12 @@ def playVideosURL(url):
     play_videos = os.system(f"mpv --no-resume-playback {url} ")
     return videos.searchVideos()
 
-def addSongs(videoid, title, author):
+def addSongs(videoid, title, author, duration, explicit):
     print(colored("\nGathering info...", 'green', attrs=['bold']), end="\r")
     queue_list.append(videoid)
     title_list.append(title)
     author_list.append(author)
-    item_list.append(f"{colored(title, 'red')} - {colored(author, 'cyan')}")
+    item_list.append(f"{colored(title, 'red')} - {colored(author, 'cyan')} ({duration}) {explicit}")
     added = print(colored(f"{fixFormatting(title)} - ", 'cyan') + colored(f"{fixFormatting(author)}", 'red') + colored(" has been added to the queue.", 'green'))
     return songs.searchSongs()
 
