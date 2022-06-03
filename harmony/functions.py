@@ -124,7 +124,7 @@ def getSongs(query):
     print(colored("\nSearching for songs...", 'cyan', attrs=['bold']))
     searchurl = requests.request("GET", f"{SEARCH_URL}/search/songs?query={query}&page=1&limit=20", headers=headers).text.encode()
     searchjson = json.loads(searchurl)
-    if len(searchjson['results']) == 0:
+    if searchjson['status'] == "FAILED" or len(searchjson['results']) == 0:
         return noResults(query), songs.searchSongs()
     print(colored("\nFound results!", 'green', attrs=['bold']), end="\r")
     time.sleep(0.5)
@@ -152,7 +152,7 @@ def playTracks():
     print(colored("Launching MPV and searching for Lyrics...", 'green', attrs=['bold']), end="\r")
     for track, title, author in zip(queue_list, title_list, author_list):
         lyricsToVtt(f"{title} - {author}")
-        os.system(f"mpv --no-video --term-osd-bar --no-resume-playback --term-playing-msg='{fixFormatting(colored(title, 'red'))} - {fixFormatting(colored(author, 'cyan'))}' '{track}' {SUB_FILE} ")
+        os.system(f"mpv --no-video --term-osd-bar --no-resume-playback {SUB_FILE} --term-playing-msg='{fixFormatting(colored(title, 'red'))} - {fixFormatting(colored(author, 'cyan'))}' '{track}'")
         removeSubs()
     return emptyQueue(), removeSubs(), songs.searchSongs()
 
