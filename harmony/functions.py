@@ -63,6 +63,10 @@ def noResults(result):
     info = print(colored(f"\nUnable to find any results for {colored(result, 'cyan')}!", 'red', attrs=['bold']))
     return 
 
+def apiFailure():
+    info = print(colored("Unable to search for any songs! Please try again later."))
+    return 
+
 def noStreamUrl():
     info = print(colored(f"\nUnable to find any a stream URL!", 'red', attrs=['bold']))
     return 
@@ -124,8 +128,10 @@ def getSongs(query):
     print(colored("\nSearching for songs...", 'cyan', attrs=['bold']))
     searchurl = requests.request("GET", f"{SEARCH_URL}/search/songs?query={query}&page=1&limit=20", headers=headers).text.encode()
     searchjson = json.loads(searchurl)
-    if searchjson['status'] == "FAILED" or len(searchjson['results']) == 0:
+    if len(searchjson['results']) == 0:
         return noResults(query), songs.searchSongs()
+    elif searchjson['status'] == "FAILED":
+        return apiFailure(), songs.searchSongs()
     print(colored("\nFound results!", 'green', attrs=['bold']), end="\r")
     time.sleep(0.5)
     print(colored("Loading results...", 'green', attrs=['bold']), end="\r")
@@ -162,7 +168,7 @@ def playVideos():
     queuemsg = print(colored("\nPlaying videos in the Queue", 'cyan', attrs=['bold']) + colored(' (Q)uit, (L)oop\n', 'red')) 
     show_queue = print(f"\n".join([f"{colored(i, 'green')}. {fixFormatting(track)} \n" for i, track in enumerate((item_list), start=1)]))     
     print(colored("Launching MPV...", 'green', attrs=['bold']), end="\r")
-    play_videos = [os.system(f"mpv --term-osd-bar --no-resume-playback '{track}' --audio-file='{audio}' --force-media-title='{fixFormatting(title)}'") for track, audio, title in zip(queue_list, audio_list, title_list)]
+    play_videos = [os.system(f"mpv --term-osd-bar --force-media-title='{fixFormatting(title)} --no-resume-playback '{track}' --audio-file='{audio}''") for track, audio, title in zip(queue_list, audio_list, title_list)]
     return emptyQueue(), videos.searchVideos()
 
 def playTracksURL(url):
