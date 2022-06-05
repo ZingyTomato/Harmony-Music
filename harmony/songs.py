@@ -66,7 +66,7 @@ def pickTrack(song, json):
 
   videoid = json['results'][int(option) - 1]['downloadUrl'][4]['link']
   title = json['results'][int(option) - 1]['name']
-  author = json['results'][int(option) - 1]['primaryArtists']
+  author = json['results'][int(option) - 1]['primaryArtists'].split(',', 1)[0]
   duration = time.strftime('%M:%S',time.gmtime(int(json['results'][int(option) - 1]['duration'])))
   explicit = functions.isExplicit(json['results'][int(option) - 1]['explicitContent'])
   
