@@ -18,7 +18,7 @@ jobs:
 
     - run: mkdir build
     - run: cd build
-    - run: pip install -r ./harmony/requirements.txt pyinstaller
+    - run: pip install -r requirements.txt pyinstaller
     - run: pyinstaller --onefile ./harmony/harmony.py
     - uses: actions/upload-artifact@v2
       with:
