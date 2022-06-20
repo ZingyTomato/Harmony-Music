@@ -77,16 +77,11 @@ def queueIsEmpty():
 def fixFormatting(text):
     inital_text = html.unescape(f'{text}')
     final_text = re.sub("[\"\']", "", inital_text)
-    final_title = final_text.split(',', 1)[0]
-    return final_title
-
-def removeBrackets(text):
-    final_text = re.sub("[\(\[].*?[\)\]]", "", text)
     return final_text
 
 def isExplicit(value):
     if value == 1:
-        explicit = colored("🅴", 'green')
+        explicit = colored("(E)", 'green')
         return explicit
     else:
         return ""
@@ -158,7 +153,7 @@ def playTracks():
     showQueue()
     print(colored("\nLaunching MPV and searching for Lyrics...", 'green', attrs=['bold']), end="\r")
     for track, title, author in zip(queue_list, title_list, author_list):
-        lyrics.searchLyrics(f"{removeBrackets(title)} - {fixFormatting(author)}")
+        lyrics.searchLyrics(f"{fixFormatting(title)} - {fixFormatting(author)}")
         os.system(f"mpv --no-video --term-osd-bar --no-resume-playback {SUB_FILE} --term-playing-msg='{fixFormatting(colored(title, 'red'))} - {fixFormatting(colored(author, 'cyan'))}' '{track}'")
         removeSubs()
     return emptyQueue(), removeSubs(), songs.searchSongs()
