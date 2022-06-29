@@ -26,7 +26,7 @@ def searchLyrics(query):
             file.write("\n")
             file.write(f"{parseTime(v['seconds'])} --> {parseTime(data[i + 1]['seconds'])}")
             file.write("\n")
-            file.write(f"♪ {v['lyrics']} ♪".upper())
+            file.write(f"{v['lyrics']}".upper())
             file.write("\n")
           except IndexError:
             return
