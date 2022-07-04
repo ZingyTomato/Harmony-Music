@@ -30,6 +30,8 @@ SEARCH_URL = "https://saavn.me"
 
 LYRICS_API = "https://api.textyl.co/api"
 
+TRENDING_API = "https://charts-spotify-com-service.spotify.com/public/v0/charts"
+
 SUB_FILE = ""
 
 def emptyQueue():
@@ -171,5 +173,16 @@ def addSongs(videoid, title, author, duration, explicit):
     item_list.append(f"{colored(title, 'red')} - {colored(author, 'cyan')} ({duration}) {explicit}")
     added = print(colored(f"\n{fixFormatting(title)} - ", 'cyan') + colored(f"{fixFormatting(author)}", 'red') + colored(" has been added to the queue.", 'green'))
     return songs.searchSongs()
+
+def getTrending():
+    clearScreen()
+    print(colored("\nSearching for trending tracks...\n", 'cyan', attrs=['bold']))
+    searchurl = requests.request("GET", f"{TRENDING_API}", headers=headers).text.encode()
+    searchjson = json.loads(searchurl)
+    return showTrending(searchjson)
+
+def showTrending(result):
+    lists = print(f"\n".join([f"{colored(i, 'green')}. {colored(fixFormatting(item['trackMetadata']['trackName']), 'red', attrs=['bold'])} - {fixFormatting(colored(item['trackMetadata']['artists'][0]['name'], 'cyan'))}" for i, item in enumerate((result['chartEntryViewResponses'][0]['entries']), start=1)]))
+    return 
 
 signal.signal(signal.SIGINT, forceQuit)
