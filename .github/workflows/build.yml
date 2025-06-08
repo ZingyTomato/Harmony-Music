@@ -3,26 +3,38 @@ on:
     types: [published]
   workflow_dispatch:
 
+permissions:
+  contents: write
+  actions: read
+
 jobs:
   build:
-    runs-on: ['ubuntu-24.04']
+    runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v2
-
-    - uses: actions/setup-python@v2
+    - uses: actions/checkout@v4
+    
+    - uses: actions/setup-python@v5
       with:
         python-version: "3.10"
-
-    - run: pip install -r requirements.txt pyinstaller
-
-    - run: pyinstaller --onefile ./harmony/harmony.py
-
+    
+    - name: Install dependencies
+      run: |
+        pip install --upgrade pip
+        pip install -r requirements.txt pyinstaller
+    
+    - name: Build with PyInstaller
+      run: pyinstaller --onefile ./harmony/harmony.py
+    
     - name: Upload to Release
-      uses: actions/upload-release-asset@v1
+      if: github.event_name == 'release'
+      run: |
+        gh release upload ${{ github.event.release.tag_name }} ./dist/harmony
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Upload as Artifact
+      if: github.event_name == 'workflow_dispatch'
+      uses: actions/upload-artifact@v4
       with:
-        upload_url: ${{ github.event.release.upload_url }}
-        asset_path: ./dist/harmony
-        asset_name: harmony
-        asset_content_type: application/octet-stream
+        name: harmony-binary
+        path: ./dist/harmony
