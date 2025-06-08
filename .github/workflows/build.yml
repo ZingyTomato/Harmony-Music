@@ -1,26 +1,28 @@
 on:
-  push:
+  release:
+    types: [published]
   workflow_dispatch:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: ['ubuntu-latest']
-
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+
     - uses: actions/setup-python@v2
       with:
-        python-version: 3.7
+        python-version: 3.10
 
-    - run: mkdir build
-    - run: cd build
     - run: pip install -r requirements.txt pyinstaller
+
     - run: pyinstaller --onefile ./harmony/harmony.py
-    - uses: actions/upload-artifact@v2
+
+    - name: Upload to Release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        name: harmony-binaries
-        path: dist
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: ./dist/harmony
+        asset_name: harmony
+        asset_content_type: application/octet-stream
