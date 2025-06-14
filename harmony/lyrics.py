@@ -6,16 +6,21 @@ from pathlib import Path
 import syncedlyrics
 
 
-def create_lyrics_file(query: str):
-    """Create lyrics file for current track"""
-    try:
-        syncedlyrics.search(query, plain_only=False, save_path="lyrics.lrc",
-                            providers=["Lrclib", "NetEase"]) ## Seems to provide the most accurate synced lyrics amongst other providers.
+def create_lyrics_file(query: str, directory: str, synced: bool):
+    """Creates a .vtt file for current track"""
+    
+    if synced == False: ## If the user has specified no synced lyrics
+        Path(f"{directory}/lyrics.vtt").write_text("WEBVTT\n\n")
+        return
         
-        convert_lrc_to_vtt("lyrics.lrc", "lyrics.vtt")
+    try:
+        syncedlyrics.search(query, plain_only=False, save_path=f"{directory}/lyrics.lrc",
+                            providers=["Lrclib"]) ## Seems to provide the most accurate synced lyrics amongst other providers.
+        
+        convert_lrc_to_vtt(f"{directory}/lyrics.lrc", f"{directory}/lyrics.vtt")
     except:
         # If lyrics fail, create empty file so mpv doesn't error
-        Path("lyrics.vtt").write_text("WEBVTT\n\n")
+        Path(f"{directory}/lyrics.vtt").write_text("WEBVTT\n\n")
 
 
 def convert_lrc_to_vtt(lrc_path: str, vtt_path: str):
@@ -62,3 +67,5 @@ def convert_lrc_to_vtt(lrc_path: str, vtt_path: str):
     except Exception:
         # Create empty VTT file on error
         Path(vtt_path).write_text("WEBVTT\n\n")
+    
+    Path(lrc_path).unlink(missing_ok=True) ## Delete the LRC file

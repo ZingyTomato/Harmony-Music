@@ -5,7 +5,7 @@
 
 <div align="center" width="60%" height="auto">
   <br>
-    <img src="showcase/2022-05-15 21-45-16.gif">
+    <img src="showcase/2025-06-13 22-14-08.gif">
 </div>
 
 # 📖 Table Of Contents
@@ -57,10 +57,12 @@ positional arguments:
                   https://open.spotify.com/xxxx)'
 
 options:
-  -h, --help      show this help message and exit
+  -h, --help      Shows this help message and exits.
   -t, --trending  Displays the top 20 trending tracks around the world.
   -p, --persist   Ensures the queue's content is persistent and that tracks aren't
                   deleted after being played.
+  -v, --version   View the program's current version.
+  -dl, --disable-lyrics   Disables synced lyrics from showing up in MPV.
 ```
 
 ## 🏥 Contributing

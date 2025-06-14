@@ -34,35 +34,51 @@ def main():
         help="Ensures the queue's content is persistent and that tracks aren't deleted after being played."
     )
     
+    parser.add_argument(
+        '-v', '--version',
+        action='store_true',
+        help="View the program's current version."
+    )
+    
+    parser.add_argument(
+        '-dl', '--disable-lyrics',
+        action='store_true',
+        help="Disables synced lyrics from showing up in MPV."
+    )
+    
     args = parser.parse_args()
     
     try:
         player = MusicPlayer()
+        player.set_lyrics_mode(args.disable_lyrics) ## Set synced lyrics preference
+        player.set_queue_persist(args.persist) ## ## Set queue persistance preference
         
         if args.trending:
             player.get_trending()
+        elif args.version:
+            print(player.get_version())
         elif args.query:
             query = ' '.join(args.query)
             
             if player.is_url(query):
               if player.is_track_url(query): ## If its a spotify track
-                  player.add_sp_track_to_queue(args.persist) 
-                  player.interactive_mode(args.persist)
+                  player.add_sp_track_to_queue() 
+                  player.interactive_mode()
               elif player.is_album_url(query): ## If its a spotify album
-                  player.add_sp_album_to_queue(args.persist) 
-                  player.interactive_mode(args.persist)
+                  player.add_sp_album_to_queue() 
+                  player.interactive_mode()
               elif player.is_playlist_url(query): ## If its a spotify playlist
-                  player.add_sp_playlist_to_queue(args.persist) 
-                  player.interactive_mode(args.persist)
+                  player.add_sp_playlist_to_queue() 
+                  player.interactive_mode()
             else:
                 results = player.search_songs(query)
                 if results:
                     track = player.display_results(query, results)
                     if track:
-                        player.add_to_queue(track, args.persist)
-                        player.interactive_mode(args.persist)
+                        player.add_to_queue(track)
+                        player.interactive_mode()
         else:
-            player.interactive_mode(args.persist)
+            player.interactive_mode()
             
     except KeyboardInterrupt:
         print("\nExiting...")
