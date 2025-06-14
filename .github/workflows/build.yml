@@ -9,39 +9,73 @@ permissions:
 
 jobs:
   build:
+    name: Build harmony with static PyInstaller
     runs-on: ubuntu-latest
-    container: python:3.10-slim
+    
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Install system dependencies
-      run: |
-        apt-get update
-        apt-get install -y build-essential git
-    
-    - name: Install dependencies
-      run: |
-        pip install --upgrade pip
-        pip install -r requirements.txt pyinstaller
-    
-    - name: Build with PyInstaller
-      run: |
-        cd harmony
-        pyinstaller --onefile --name harmony harmony.py
-        # Move the binary back to the expected location
-        mkdir -p ../dist
-        mv dist/harmony ../dist/
-    
-    - name: Upload to Release
-      if: github.event_name == 'release'
-      run: |
-        gh release upload ${{ github.event.release.tag_name }} ./dist/harmony
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    
-    - name: Upload as Artifact
-      if: github.event_name == 'workflow_dispatch'
-      uses: actions/upload-artifact@v4
-      with:
-        name: harmony
-        path: ./dist/harmony
+      - name: Checkout your project
+        uses: actions/checkout@v4
+        with:
+          path: harmony-project
+      
+      - name: Checkout PyInstaller
+        uses: actions/checkout@v4
+        with:
+          repository: pyinstaller/pyinstaller
+          ref: v6.13.0
+          path: pyinstaller-src
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential gcc-multilib libc6-dev
+      
+      - name: Build static PyInstaller bootloader
+        run: |
+          cd pyinstaller-src/bootloader
+          python waf distclean all --gcc
+      
+      - name: Install PyInstaller from source
+        run: |
+          cd pyinstaller-src
+          pip install wheel
+          python setup.py install
+      
+      - name: Install your project dependencies
+        run: |
+          cd harmony-project
+          pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Build your application with static PyInstaller
+        run: |
+          cd harmony-project/harmony
+          # Use the custom-built PyInstaller with static bootloader
+          pyinstaller --onefile --name harmony \
+            --strip --clean --noconfirm \
+            harmony.py
+          
+          # Move binary to expected location
+          mkdir -p ../dist
+          mv dist/harmony ../dist/
+          echo "Build completed successfully"
+      
+      - name: Upload to Release
+        if: github.event_name == 'release'
+        run: |
+          cd harmony-project
+          gh release upload ${{ github.event.release.tag_name }} ./dist/harmony
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Upload as Artifact
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: harmony
+          path: harmony-project/dist/harmony
