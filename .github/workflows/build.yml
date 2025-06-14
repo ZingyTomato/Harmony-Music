@@ -9,18 +9,15 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
+    container: python:3.10-slim
     steps:
     - uses: actions/checkout@v4
     
-    - uses: actions/setup-python@v5
-      with:
-        python-version: "3.10"
-    
     - name: Install system dependencies
       run: |
-        sudo apt-get update
-        sudo apt-get install -y build-essential
+        apt-get update
+        apt-get install -y build-essential git
     
     - name: Install dependencies
       run: |
@@ -28,7 +25,12 @@ jobs:
         pip install -r requirements.txt pyinstaller
     
     - name: Build with PyInstaller
-      run: pyinstaller --onefile ./harmony/harmony.py
+      run: |
+        cd harmony
+        pyinstaller --onefile --name harmony harmony.py
+        # Move the binary back to the expected location
+        mkdir -p ../dist
+        mv dist/harmony ../dist/
     
     - name: Upload to Release
       if: github.event_name == 'release'
