@@ -40,11 +40,14 @@ jobs:
           cd pyinstaller-src/bootloader
           python waf distclean all --gcc
       
+      - name: Install build dependencies
+        run: |
+          pip install --upgrade pip setuptools wheel build
+      
       - name: Install PyInstaller from source
         run: |
           cd pyinstaller-src
-          pip install wheel
-          python setup.py install
+          pip install .
       
       - name: Install your project dependencies
         run: |
@@ -55,7 +58,6 @@ jobs:
       - name: Build your application with static PyInstaller
         run: |
           cd harmony-project/harmony
-          # Use the custom-built PyInstaller with static bootloader
           pyinstaller --onefile --name harmony \
             --strip --clean --noconfirm \
             harmony.py
