@@ -2,11 +2,10 @@ on:
   release:
     types: [published]
   workflow_dispatch:
-
 permissions:
   contents: write
   actions: read
-
+  
 jobs:
   build:
     name: Build harmony with static PyInstaller
@@ -34,6 +33,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential gcc-multilib libc6-dev
+          # Install newer OpenSSL development packages
+          sudo apt-get install -y libssl-dev libcurl4-openssl-dev
       
       - name: Build static PyInstaller bootloader
         run: |
@@ -60,9 +61,12 @@ jobs:
           cd harmony-project/harmony
           pyinstaller --onefile --name harmony \
             --strip --clean --noconfirm \
+            --exclude-module ssl \
+            --exclude-module _ssl \
+            --add-binary "/usr/lib/x86_64-linux-gnu/libssl.so.3:." \
+            --add-binary "/usr/lib/x86_64-linux-gnu/libcrypto.so.3:." \
             harmony.py
           
-          # Move binary to expected location
           mkdir -p ../dist
           mv dist/harmony ../dist/
           echo "Build completed successfully"
