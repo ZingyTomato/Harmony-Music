@@ -32,7 +32,7 @@ def cleanup_files(directory: str):
             Path(f"{directory}/{file}").unlink(missing_ok=True)
         except:
             pass
-        
+
 def is_integer(val):
     """ Check if input is a valid integer to be used as index in the queue """
     try:
@@ -40,20 +40,20 @@ def is_integer(val):
         return True
     except ValueError:
         return False
-    
+
 def check_integers_with_spaces(input_str: str):
     """ Check if input is multiples integers separated by spaces """
     if not input_str.strip():  # Handle empty string
         return False
-    
+
     parts = input_str.split()
     return all(part.isdigit() for part in parts)
-    
+
 def create_config_folder():
     """Create folder in ~/.config only if it doesn't exist to store lyrics"""
     config_dir = Path.home() / '.config' / "harmony" / "lyrics"
-    
+
     if not config_dir.exists():
         config_dir.mkdir(parents=True)
-    
+
     return config_dir

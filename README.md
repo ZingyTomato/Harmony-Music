@@ -28,8 +28,9 @@ Harmony is a command line tool to stream music from the command line without wor
 - [x] Streams **320 kbps** audio.
 - [x] Support for real-time synced lyrics.
 - [x] A proper queue system: Can delete, reorder, remove and move tracks.
+- [x] Support for locally stored playlists.
 - [x] Supports Spotify tracks, albums & playlists.
-- [x] Displays the top trending tracks around the world to enable discovery of new music.
+- [x] Displays the top trending tracks right now.
 
 ## 📜 Requirements
 
@@ -47,22 +48,25 @@ sudo chmod a+rx /usr/local/bin/harmony
 ## 👨‍🔧 Usage
 
 ```
-usage: harmony [-h] [-t] [-p] [query ...]
+usage: harmony [-h] [-t] [-p] [-pl] [-v] [-dl] [query ...]
 
 Harmony - An open souce TUI music streamer based on MPV.
+https://github.com/ZingyTomato/Harmony-Music
 
 positional arguments:
-  query           Search for a song (e.g., 'harmony Never Gonna Give You Up',) Use a
-                  valid Spotify track/album/playlist URL (e.g, 'harmony
-                  https://open.spotify.com/xxxx)'
+  query                 Search for a song (e.g., 'harmony Never Gonna Give You      
+  
+                          Up'), Use a valid Spotify track/album/playlist URL (e.g, 'harmony https://open.spotify.com/xxxx)'
 
 options:
-  -h, --help      Shows this help message and exits.
-  -t, --trending  Displays the top 20 trending tracks around the world.
-  -p, --persist   Ensures the queue's content is persistent and that tracks aren't
-                  deleted after being played.
-  -v, --version   View the program's current version.
-  -dl, --disable-lyrics   Disables synced lyrics from showing up in MPV.
+  -h, --help            show this help message and exit
+  -t, --trending        Displays the top 20 trending tracks around the world.
+  -p, --persist         Ensures the queue's content is persistent and that tracks aren't
+                        deleted after being played.
+  -pl, --playlist       See your current playlists and create new ones.
+  -v, --version         View the program's current version.
+  -dl, --disable-lyrics
+                        Disables synced lyrics from showing up in MPV.
 ```
 
 ## 🏥 Contributing
