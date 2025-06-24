@@ -59,13 +59,7 @@ jobs:
       - name: Build your application with static PyInstaller
         run: |
           cd harmony-project/harmony
-          pyinstaller --onefile --name harmony \
-            --strip --clean --noconfirm \
-            --exclude-module ssl \
-            --exclude-module _ssl \
-            --add-binary "/usr/lib/x86_64-linux-gnu/libssl.so.3:." \
-            --add-binary "/usr/lib/x86_64-linux-gnu/libcrypto.so.3:." \
-            harmony.py
+          pyinstaller --onefile --name harmony harmony.py
           
           mkdir -p ../dist
           mv dist/harmony ../dist/

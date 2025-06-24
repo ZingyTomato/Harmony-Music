@@ -1,5 +1,6 @@
-requests
-termcolor
-argparse
-syncedlyrics
-spotipy
+requests==2.32.3
+termcolor==3.1.0
+argparse==1.4.0
+syncedlyrics==1.0.1
+spotipy==2.25.1
+mpv==1.0.8

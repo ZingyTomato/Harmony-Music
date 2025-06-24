@@ -8,7 +8,7 @@ import subprocess
 from typing import List, Dict, Optional
 import requests
 from termcolor import colored
-from utils import clear_screen, format_text, format_duration, cleanup_files, create_config_folder
+from utils import clear_screen, format_text, format_duration, cleanup_files, create_config_folder, get_artist_names
 from lyrics import create_lyrics_file
 from spotify_integration import SpotifyIntegration
 from database import PlaylistDB
@@ -18,13 +18,11 @@ from playlist_manager import PlaylistManager
 from track_utils import create_track 
 import json
 
-
 class MusicPlayer:
     """Main music player class handling all functionality"""
 
     def __init__(self):
-        self.__version__ = "0.6.0"
-        self.queue = []
+        self.__version__ = "0.6.1"
         self.playlist_queue = []
         self.headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101 Firefox/91.0'
@@ -33,14 +31,16 @@ class MusicPlayer:
         self.trending_api = "https://charts-spotify-com-service.spotify.com/public/v0/charts"
         self.spotify = SpotifyIntegration()
 
-        self.persist = True ## To figure out whether or not to keep the queue persistent
         self.config_folder = create_config_folder() ## Store config folder directory
         self.synced_lyrics = True ## To figure out whether or not to display synced lyrics
+        self.loop = False ## Looping the queue is disabled by default
 
         self.playlist_db = PlaylistDB(self.config_folder)
-        self.url_parser = URLParser() # New
-        self.queue_manager = QueueManager(self.queue, self.persist, self.config_folder, self.synced_lyrics) # New
-        self.playlist_manager = PlaylistManager(self.playlist_db, self.playlist_queue, self.queue_manager) # New
+        self.queue = self.playlist_db.get_queue_from_db()
+        self.url_parser = URLParser() 
+        self.queue_manager = QueueManager(self.queue, self.config_folder, self.synced_lyrics, self.loop,
+                                          self.playlist_db) 
+        self.playlist_manager = PlaylistManager(self.playlist_db, self.playlist_queue, self.queue_manager) 
 
         # Handle Ctrl+C gracefully
         signal.signal(signal.SIGINT, self._handle_interrupt)
@@ -85,7 +85,7 @@ class MusicPlayer:
         tracks = results['results']
         for i, track in enumerate(tracks, 1):
             title = format_text(track['name'])
-            artist = format_text(track['artists']['primary'][0]['name'])
+            artist = get_artist_names(track['artists']['primary'])
             duration = format_duration(int(track['duration']))
             explicit = colored("(E)", 'green') if track.get('explicitContent') else ""
 
@@ -98,7 +98,7 @@ class MusicPlayer:
     def _pick_track(self, tracks: List[Dict]) -> Optional[Dict]:
         """Let user pick a track from results"""
         while True:
-            choice = input(colored(f"\nPick [1-{len(tracks)}, (B)ack, (Q)uit, (A)dd to Playlist]: ", 'red'))
+            choice = input(colored(f"\nPick [1-{len(tracks)}, (B)ack, (Q)uit, (A)dd to Playlist (space-separated for multiple)]: ", 'red'))
 
             if choice.lower() == 'q':
                 cleanup_files(self.config_folder)
@@ -172,7 +172,7 @@ class MusicPlayer:
         """ Add a track from Spotify to the queue """
         track_info = self.spotify.get_track_info(self.url_parser.track_id)
         title = track_info['name']
-        artist = track_info['artists'][0]['name']
+        artist = get_artist_names(track_info['artists'])
         duration = format_duration(track_info['duration_ms']/1000) ## Format in seconds, not ms.
         url = self.get_url(title, artist)
 
@@ -184,6 +184,7 @@ class MusicPlayer:
         })
 
         print(colored(f"\nAdded {title} - {artist}", 'green', attrs=['bold']))
+        self.playlist_db.add_queue_to_db(self.queue)
 
     def add_sp_album_to_queue(self):
         """ Add an album from Spotify to the queue """
@@ -192,7 +193,7 @@ class MusicPlayer:
         for track_info in tracks:
 
             title = track_info['name']
-            artist = track_info['artists'][0]['name']
+            artist = get_artist_names(track_info['artists'])
             duration = format_duration(track_info['duration_ms']/1000) ## Format in seconds, not ms.
             url = self.get_url(title, artist)
 
@@ -203,7 +204,8 @@ class MusicPlayer:
                 'url': url
                 })
 
-        print(colored(f"\nAdded {len(tracks)} tracks to the queue", 'green', attrs=['bold']))
+        print(colored(f"\nAdded {len(tracks)} track(s) to the queue", 'green', attrs=['bold']))
+        self.playlist_db.add_queue_to_db(self.queue)
 
     def add_sp_playlist_to_queue(self):
         """ Add a playlist from Spotify to the queue """
@@ -213,7 +215,7 @@ class MusicPlayer:
         for track_info in tracks:
 
             title = track_info['track']['name']
-            artist = track_info['track']['artists'][0]['name']
+            artist = get_artist_names(track_info['artists'])
             duration = format_duration(track_info['track']['duration_ms']/1000) ## Format in seconds, not ms.
             url = self.get_url(title, artist)
 
@@ -224,7 +226,8 @@ class MusicPlayer:
                 'url': url
                 })
 
-        print(colored(f"\nAdded {len(tracks)} tracks to the queue", 'green', attrs=['bold']))
+        print(colored(f"\nAdded {len(tracks)} track(s) to the queue", 'green', attrs=['bold']))
+        self.playlist_db.add_queue_to_db(self.queue)
 
     def get_url(self, title: str, artist: str):
         """ Get the track's stream URL """
@@ -327,15 +330,7 @@ class MusicPlayer:
             self.queue_manager.synced_lyrics = False
         return
 
-    def set_queue_persist(self, persist: bool):
-        if persist:
-            self.persist = True
-            self.queue_manager.persist = True
-        return
-
     def playlist_info(self):
         """ Various options for playlists"""
-        self.persist = True ## Don't delete items from the playlist queue
-        self.queue_manager.persist = True ## Reflect the change in queue manager
         self.playlist_db.create_table()
         self.playlist_manager.playlist_info()

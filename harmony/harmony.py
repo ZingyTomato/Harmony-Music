@@ -26,31 +26,25 @@ def main():
     parser.add_argument(
         '-t', '--trending',
         action='store_true',
-        help="Displays the top 20 trending tracks around the world."
+        help="Displays the top 20 trending tracks worldwide."
     )
 
     parser.add_argument(
-        '-p', '--persist',
+        '-p', '--playlist',
         action='store_true',
-        help="Ensures the queue's content is persistent and that tracks aren't deleted after being played."
-    )
-
-    parser.add_argument(
-        '-pl', '--playlist',
-        action='store_true',
-        help="See your current playlists and create new ones."
+        help="View existing playlists or create new ones."
     )
 
     parser.add_argument(
         '-v', '--version',
         action='store_true',
-        help="View the program's current version."
+        help="Display the current version of the program."
     )
 
     parser.add_argument(
         '-dl', '--disable-lyrics',
         action='store_true',
-        help="Disables synced lyrics from showing up in MPV."
+        help="Disable synchronized lyrics display in MPV."
     )
 
     args = parser.parse_args()
@@ -58,8 +52,6 @@ def main():
     try:
         player = MusicPlayer()
         player.set_lyrics_mode(args.disable_lyrics) ## Set synced lyrics preference
-        player.set_queue_persist(args.persist) ## ## Set queue persistance preference
-
         if args.trending:
             player.get_trending()
         elif args.version:

@@ -19,7 +19,7 @@
 
 ## ❔ What's this?
 
-Harmony is a command line tool to stream music from the command line without worrying about tracking/profiling. Harmony streams music from [`Jiosaavn`](https://jiosaavn.com), using a [`Jiosaavn API`](https://github.com/sumitkolhe/jiosaavn-api) to both fetch results and stream music. [It's meant to act as a privacy respecting Spotify TUI.]
+Harmony is a command line tool to stream music from the command line without worrying about tracking/profiling. Harmony streams music from [`Jiosaavn`](https://jiosaavn.com), using a [`Jiosaavn API`](https://github.com/sumitkolhe/jiosaavn-api) to both fetch results and stream music.
  
 ## 🎧 Features
 
@@ -48,7 +48,7 @@ sudo chmod a+rx /usr/local/bin/harmony
 ## 👨‍🔧 Usage
 
 ```
-usage: harmony [-h] [-t] [-p] [-pl] [-v] [-dl] [query ...]
+usage: harmony [-h] [-t] [-p] [-v] [-dl] [query ...]
 
 Harmony - An open souce TUI music streamer based on MPV.
 https://github.com/ZingyTomato/Harmony-Music
@@ -60,13 +60,11 @@ positional arguments:
 
 options:
   -h, --help            show this help message and exit
-  -t, --trending        Displays the top 20 trending tracks around the world.
-  -p, --persist         Ensures the queue's content is persistent and that tracks aren't
-                        deleted after being played.
-  -pl, --playlist       See your current playlists and create new ones.
-  -v, --version         View the program's current version.
+  -t, --trending        Displays the top 20 trending tracks worldwide.
+  -p, --playlist        View existing playlists or create new ones.
+  -v, --version         Display the current version of the program.
   -dl, --disable-lyrics
-                        Disables synced lyrics from showing up in MPV.
+                        Disable synchronized lyrics display in MPV.
 ```
 
 ## 🏥 Contributing

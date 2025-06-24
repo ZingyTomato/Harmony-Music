@@ -19,10 +19,12 @@ def format_text(text: str) -> str:
     cleaned = html.unescape(str(text))
     return cleaned
 
-
 def format_duration(seconds: int) -> str:
     """Format duration in MM:SS format"""
     return time.strftime('%M:%S', time.gmtime(seconds))
+
+def get_artist_names(artist_list):
+    return ', '.join(format_text(artist['name']) for artist in artist_list)
 
 
 def cleanup_files(directory: str):

@@ -43,7 +43,9 @@ class PlaylistManager:
                     print(colored("\nInvalid input!", 'red', attrs=['bold']))
                     continue
 
-                if name is None or name is False:
+                if name is None and data is None:
+                    continue
+                elif name is None or name is False:
                     print(colored("\nInvalid input!", 'red', attrs=['bold']))
                     continue
 

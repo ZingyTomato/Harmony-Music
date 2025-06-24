@@ -6,6 +6,8 @@ class PlaylistDB:
     def __init__(self, config_folder: str):
         self.playlist_conn = sqlite3.connect(f'{config_folder}/playlist.db') ## DB to store playlists
         self.playlist_cursor = self.playlist_conn.cursor()
+        self.queue_conn = sqlite3.connect(f'{config_folder}/queue.db') ## DB to store playlists
+        self.queue_cursor = self.queue_conn.cursor()
         self.create_table()
 
     def create_table(self):
@@ -15,18 +17,24 @@ class PlaylistDB:
                 metadata JSON
             )
         ''')
+        self.queue_cursor.execute('''
+            CREATE TABLE IF NOT EXISTS queue (
+                metadata JSON
+            )
+        ''')
+        
         self.commit_db()
 
     def commit_db(self):
         """ Commit changes to the database """
         self.playlist_conn.commit()
+        self.queue_conn.commit()
 
     def create_playlist(self, name: str):
         self.playlist_cursor.execute('''
             INSERT INTO playlists (name, metadata) VALUES (?, ?)''', (name, json.dumps([])))
         self.commit_db()
         print(colored(f"\nCreated playlist {name}!", 'green', attrs=['bold']))
-
 
     def get_all_playlists(self):
         return self.playlist_cursor.execute('SELECT name, metadata FROM playlists').fetchall()
@@ -67,3 +75,23 @@ class PlaylistDB:
         self.playlist_cursor.execute('''
             DELETE FROM playlists WHERE name = ?''', (name,))
         self.commit_db()
+        
+    def add_queue_to_db(self, queue: list):
+
+        self.queue_cursor.execute('''
+            INSERT OR REPLACE INTO queue (metadata) VALUES (?)
+        ''', (json.dumps({}),)) ## Insert a value before updating queue 
+        
+        self.queue_cursor.execute('''
+            UPDATE queue SET metadata = ? 
+        ''', (json.dumps(queue),)) ## Add the updated queue
+        
+        self.commit_db()
+        
+    def get_queue_from_db(self):
+        query = 'SELECT metadata FROM queue'
+        rows = self.queue_cursor.execute(query).fetchall()
+        if rows == []: ## If launched for the first time
+            return [] 
+        else:
+            return json.loads(rows[0][0])
