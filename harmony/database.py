@@ -91,7 +91,7 @@ class PlaylistDB:
     def get_queue_from_db(self):
         query = 'SELECT metadata FROM queue'
         rows = self.queue_cursor.execute(query).fetchall()
-        if rows == []: ## If launched for the first time
+        if rows == []: ## If launched for the first time or if the queue is empty
             return [] 
         else:
             return json.loads(rows[0][0])

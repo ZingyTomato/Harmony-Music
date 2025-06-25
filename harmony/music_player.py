@@ -16,13 +16,12 @@ from url_parser import URLParser
 from queue_manager import QueueManager
 from playlist_manager import PlaylistManager
 from track_utils import create_track 
-import json
 
 class MusicPlayer:
     """Main music player class handling all functionality"""
 
     def __init__(self):
-        self.__version__ = "0.6.1"
+        self.__version__ = "0.6.2"
         self.playlist_queue = []
         self.headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101 Firefox/91.0'

@@ -1,6 +1,6 @@
 <div align="center">
 <h1>🎶 Harmony Music</h1>
-<h4>An easy way to stream music from the command line while regaining your privacy.</h4>
+<h4>Stream music from your terminal without compromising your privacy.</h4>
 </div>
 
 <div align="center" width="60%" height="auto">
@@ -23,14 +23,14 @@ Harmony is a command line tool to stream music from the command line without wor
  
 ## 🎧 Features
 
-- [x] Minimal Resource Usage. **1-5%** CPU usage while streaming music.
-- [x] No tracking whatsoever.
-- [x] Streams **320 kbps** audio.
-- [x] Support for real-time synced lyrics.
-- [x] A proper queue system: Can delete, reorder, remove and move tracks.
-- [x] Support for locally stored playlists.
-- [x] Supports Spotify tracks, albums & playlists.
-- [x] Displays the top trending tracks right now.
+- [x] **Efficient performance** - Minimal 1-5% CPU footprint during playback.
+- [x] **Privacy-first design** - No data collection or user tracking.
+- [x] **Premium audio quality** - 320 kbps bitrate streaming.
+- [x] **Synchronized lyrics** - Displays real-time synced lyrics.
+- [x] **Persistent session state** - Queue automatically saves between sessions.
+- [x] **Offline playlist support** - Device-local playlist storage.
+- [x] **Spotify compatibility** - Supports Spotify tracks, albums & playlists as links.
+- [x] **Live trending feed** - See what's trending right now.
 
 ## 📜 Requirements
 
@@ -38,7 +38,7 @@ Harmony is a command line tool to stream music from the command line without wor
 
 ## 💻 Installation
 
-Simply download the release binary from the [`releases section`](https://github.com/ZingyTomato/harmonymusic/releases) or enter the following commands below in any Linux terminal. (No windows binaries yet!)
+Simply download the release binary from the [`releases section`](https://github.com/ZingyTomato/harmonymusic/releases) or enter the following commands below in any Linux terminal. (No Windows binaries yet!)
 
 ```
 sudo wget https://github.com/ZingyTomato/harmonymusic/releases/latest/download/harmony -O /usr/local/bin/harmony

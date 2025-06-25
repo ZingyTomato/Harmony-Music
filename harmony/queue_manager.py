@@ -2,9 +2,7 @@ from random import shuffle
 from termcolor import colored
 from utils import clear_screen, cleanup_files, format_duration, format_text, is_integer, check_integers_with_spaces, get_artist_names
 from lyrics import create_lyrics_file
-import mpv
-import sys
-import time
+import subprocess
 
 class QueueManager:
     def __init__(self, queue: list, config_folder: str, 
@@ -83,11 +81,11 @@ class QueueManager:
 
                 if self.loop == False: ## Provide option to enable the loop after entering interactive mode
                     self.loop = True
-                    print(colored("\nQueue loop enabled!",
+                    print(colored("\nEnabled the Queue/Track loop!",
                                   'green', attrs=['bold']))
                 else:
                     self.loop = False
-                    print(colored("\nQueue loop disabled!", 'red', attrs=['bold']))
+                    print(colored("\nDisabled the Queue/Track loop!", 'red', attrs=['bold']))
 
             elif query.lower() == 'r': ## Remove a track from the queue
 
@@ -155,60 +153,23 @@ class QueueManager:
     def play_media(self, url: str, lyrics: str, track_position: int,
                    queue: list): 
         
-        player = mpv.MPV(terminal=True, input_terminal=True,
-                         term_osd_bar=True) ## Disable the regular controls
-        
-        exit = False
-        previous = False
-        
-        @player.on_key_press('l')
-        def loop(): ## Handle queue loop logic
-            
-            if self.loop:
-                self.loop = False
-                player.term_status_msg = f"Queue Loop: Disabled"
-                time.sleep(2)
-                player.term_status_msg = player.term_status_msg = f"Track Number: {int(track_position) + 1}/{len(queue)}, (N)ext, (P)revious, (L)oop"
+            # Play with mpv
+            cmd = [
+                'mpv',
+                '--no-video',
+                '--term-osd-bar',
+                '--no-resume-playback',
+                f'--sub-file={self.config_folder}/lyrics.vtt',
+                f"--term-status-msg=Track Number: {track_position + 1}/{len(queue)}",
+                url
+            ]
 
-            else:
-                self.loop = True
-                player.term_status_msg = f"Queue Loop: Enabled"
-                time.sleep(2)
-                player.term_status_msg = player.term_status_msg = f"Track Number: {int(track_position) + 1}/{len(queue)}, (N)ext, (P)revious, (L)oop"
-                  
-        @player.on_key_press('c')
-        def clear_queue():
-            nonlocal exit
-            queue = self.clear_queue()
-            player.quit()
-            exit = True
-            
-        @player.on_key_press('q')
-        def exit_queue():
-            nonlocal exit
-            player.quit()
-            exit = True
-            
-        @player.on_key_press('n')
-        def next_track():
-            player.quit()
-            
-        @player.on_key_press('p')
-        def previous_track():
-            nonlocal previous
-            player.quit()
-            previous = True
-        
-        if len(queue) > 0:
-            player.loadfile(url, sub_file=lyrics)
-            player.term_status_msg = f"Track Number: {int(track_position) + 1}/{len(queue)}, (N)ext, (P)revious, (L)oop"
-            player.wait_for_playback()
-        
-        player.terminate()
-        if exit:
-            return "Exited"
-        elif previous:
-            return "Previous"
+            try:
+                subprocess.run(cmd, check=False)
+            except KeyboardInterrupt:
+                exit()
+            finally:
+                cleanup_files(self.config_folder)
 
     def play_queue(self, queue_to_play: list = None):
         """Play all tracks in queue"""
@@ -228,16 +189,27 @@ class QueueManager:
 
                 clear_screen()
                 print(colored("Playing queue...", 'cyan', attrs=['bold']))
-                print(colored("Controls: (Q)uit, (C)lear, Seek with arrow keys", 'red'))
+                print(colored("Controls: Next Track (Q), Exit (Ctrl + C), Seek with arrow keys", 'red'))
+                
+                if self.loop and len(queue_to_play) > 1:
+                    print(colored("Queue Loop: Enabled", 'green', attrs=['bold']))
+                elif self.loop and len(queue_to_play) == 1:
+                    print(colored("Track Loop: Enabled", 'green', attrs=['bold']))
 
+                # Show "Up Next" with proper loop handling
                 if i + 1 < len(queue_copy):
+                    # Not the last track - show next track
                     next_track = queue_copy[i + 1]
+                    print(f"\nUp Next: {colored(next_track['title'], 'red')} - {colored(next_track['artist'], 'cyan')}")
+                elif self.loop and i == len(queue_copy) - 1 and len(queue_copy) > 1:
+                    # Last track in queue and loop is enabled - show first track as "Up Next"
+                    next_track = queue_copy[0]
                     print(f"\nUp Next: {colored(next_track['title'], 'red')} - {colored(next_track['artist'], 'cyan')}")
 
                 print(f"\nNow Playing: {colored(track['title'], 'red')} - {colored(track['artist'], 'cyan')}")
 
                 create_lyrics_file(
-                    f"{track['title']} - {track['artist']}", 
+                    f"{track['title']} - {track['artist'].split(",")[0]}", 
                     self.config_folder, 
                     self.synced_lyrics
                 )
@@ -270,7 +242,7 @@ class QueueManager:
             cleanup_files(self.config_folder)
 
     def play_specific_index(self, index: int, queue_to_play: list = None, next_track_index=None):
-        """Play a specific index in queue"""
+        """Play a specific index in queue with loop functionality"""
         if queue_to_play is None:
             queue_to_play = self.queue
 
@@ -278,38 +250,60 @@ class QueueManager:
             print(colored("\nQueue is empty!", 'red', attrs=['bold']))
             return
 
-        clear_screen()
-        print(colored(f"Playing track at index {index}...", 'cyan', attrs=['bold']))
-        print(colored("Controls: (Q)uit, (C)lear, Seek with arrow keys", 'red'))
-
         try:
-            track = queue_to_play[int(index) - 1] ## Index starts from 1 in the displayed list.
-        except:
-            print(colored("\nIndex out of range!", 'red', attrs=['bold'])) ## If an invalid index was entered.
+            track = queue_to_play[int(index) - 1]  # Index starts from 1 in the displayed list
+        except IndexError:
+            print(colored("\nIndex out of range!", 'red', attrs=['bold']))
             return
 
-        if next_track_index is not None: ## Display next track in queue if present in input
-            next_track = queue_to_play[int(next_track_index) - 1]
-            print(f"\nUp Next: {colored(next_track['title'], 'red')} - {colored(next_track['artist'], 'cyan')}")
+        while True:  # Keep looping if loop is enabled
+            clear_screen()
+            print(colored(f"Playing index: {index}", 'cyan', attrs=['bold']))
+            print(colored("Controls: Next Track (Q), Exit (Ctrl + C), Seek with arrow keys", 'red'))
+            if self.loop:
+                print(colored("Track Loop: Enabled", 'green', attrs=['bold']))
 
-        print(f"\nNow Playing: {colored(track['title'], 'red')} - {colored(track['artist'], 'cyan')}")
+            # Show next track info with proper loop handling
+            if next_track_index is not None:
+                try:
+                    next_track = queue_to_play[int(next_track_index) - 1]
+                    print(f"\nUp Next: {colored(next_track['title'], 'red')} - {colored(next_track['artist'], 'cyan')}")
+                except IndexError:
+                    pass
+            elif self.loop:
+                # If loop is enabled and no next_track_index, show the same track as "Up Next"
+                print(f"\nUp Next: {colored(track['title'], 'red')} - {colored(track['artist'], 'cyan')}")
 
-        # Create lyrics file
-        create_lyrics_file(f"{track['title']} - {track['artist']}", self.config_folder,
-                           self.synced_lyrics)
+            print(f"\nNow Playing: {colored(track['title'], 'red')} - {colored(track['artist'], 'cyan')}")
 
-        try:
-            response = self.play_media(track['url'], f"{self.config_folder}/lyrics.vtt", int(index) - 1, queue_to_play)
-        except KeyboardInterrupt:
-            pass
-        finally:
-            cleanup_files(self.config_folder)
+            # Create lyrics file
+            create_lyrics_file(
+                f"{track['title']} - {track['artist']}", 
+                self.config_folder,
+                self.synced_lyrics
+            )
 
-        cleanup_files(self.config_folder)
-        return response
+            try:
+                response = self.play_media(
+                    track['url'], 
+                    f"{self.config_folder}/lyrics.vtt", 
+                    int(index) - 1, 
+                    queue_to_play
+                )
+                    
+                # If user presses next track or song ends naturally, check loop setting
+                if not self.loop:
+                    break
+
+            except KeyboardInterrupt:
+                return
+            finally:
+                cleanup_files(self.config_folder)
+
+        return None
 
     def play_indexes(self, indexes: str, queue_to_play: list = None):
-        """Play multiple indexes in the queue with Previous/Next support"""
+        """Play multiple indexes in the queue with Previous/Next support and loop functionality"""
         if queue_to_play is None:
             queue_to_play = self.queue
 
@@ -318,19 +312,69 @@ class QueueManager:
             return
 
         parts = [int(p) for p in indexes.split()]
-        i = 0
+        
+        while True:  # Keep looping if loop is enabled
+            i = 0
 
-        while i < len(parts):
-            current_index = parts[i]
-            next_index = parts[i + 1] if i + 1 < len(parts) else None
+            while i < len(parts):
+                current_index = parts[i]
 
-            response = self.play_specific_index(current_index, queue_to_play, next_index)
-
-            if response == "Exited":
-                break
-            elif response == "Previous":
-                if i > 0:
-                    i -= 1
+                try:
+                    track = queue_to_play[current_index - 1]
+                except IndexError:
+                    print(colored(f"\nIndex {current_index} out of range!", 'red', attrs=['bold']))
+                    i += 1
                     continue
 
-            i += 1
+                clear_screen()
+                print(colored(f"Playing indexes: {indexes}", 'cyan', attrs=['bold']))
+                print(colored("Controls: Next Track (Q), Exit (Ctrl + C), Seek with arrow keys", 'red'))
+                if self.loop:
+                    print(colored("Queue Loop: Enabled", 'green', attrs=['bold']))
+
+                # Show "Up Next" with proper loop handling
+                if i + 1 < len(parts):
+                    # Not the last index - show next index
+                    next_index = parts[i + 1]
+                    try:
+                        next_track = queue_to_play[next_index - 1]
+                        print(f"\nUp Next: {colored(next_track['title'], 'red')} - {colored(next_track['artist'], 'cyan')}")
+                    except IndexError:
+                        pass
+                elif self.loop and i == len(parts) - 1 and len(parts) > 1:
+                    # Last index in list and loop is enabled - show first index as "Up Next"
+                    first_index = parts[0]
+                    try:
+                        next_track = queue_to_play[first_index - 1]
+                        print(f"\nUp Next: {colored(next_track['title'], 'red')} - {colored(next_track['artist'], 'cyan')}")
+                    except IndexError:
+                        pass
+
+                print(f"\nNow Playing: {colored(track['title'], 'red')} - {colored(track['artist'], 'cyan')}")
+
+                # Create lyrics file
+                create_lyrics_file(
+                    f"{track['title']} - {track['artist']}", 
+                    self.config_folder,
+                    self.synced_lyrics
+                )
+
+                try:
+                    response = self.play_media(
+                        track['url'], 
+                        f"{self.config_folder}/lyrics.vtt", 
+                        current_index - 1, 
+                        queue_to_play
+                    )
+
+                except KeyboardInterrupt:
+                    return
+                finally:
+                    cleanup_files(self.config_folder)
+
+                i += 1
+
+            if not self.loop:
+                break
+
+            cleanup_files(self.config_folder)
