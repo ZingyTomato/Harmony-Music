@@ -44,7 +44,20 @@ jobs:
 
     - name: Build binary with PyInstaller
       run: |
-        pyinstaller --onefile --name ${{ matrix.binary_name }} harmony/harmony.py
+        pyinstaller --onefile \
+          --name ${{ matrix.binary_name }} \
+          --add-data "harmony:harmony" \
+          --hidden-import database \
+          --hidden-import lyrics \
+          --hidden-import music_player \
+          --hidden-import playlist_manager \
+          --hidden-import queue_manager \
+          --hidden-import spotify_integration \
+          --hidden-import track_utils \
+          --hidden-import url_parser \
+          --hidden-import utils \
+          --collect-all harmony \
+          harmony/harmony.py
 
     - name: Rename binary (Windows)
       if: matrix.os == 'windows-latest'
