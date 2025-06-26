@@ -11,6 +11,7 @@ on:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
@@ -33,6 +34,7 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: '3.11'
+        cache: 'pip'
 
     - name: Install dependencies
       run: |
@@ -42,11 +44,12 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       shell: bash
 
-    - name: Build binary with PyInstaller
+    - name: Build binary with PyInstaller (Unix)
+      if: runner.os != 'Windows'
       run: |
         pyinstaller --onefile \
           --name ${{ matrix.binary_name }} \
-          --add-data "harmony:harmony" \
+          --paths harmony \
           --hidden-import database \
           --hidden-import lyrics \
           --hidden-import music_player \
@@ -56,8 +59,12 @@ jobs:
           --hidden-import track_utils \
           --hidden-import url_parser \
           --hidden-import utils \
-          --collect-all harmony \
           harmony/harmony.py
+
+    - name: Build binary with PyInstaller (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        pyinstaller --onefile --name ${{ matrix.binary_name }} --paths harmony --hidden-import database --hidden-import lyrics --hidden-import music_player --hidden-import playlist_manager --hidden-import queue_manager --hidden-import spotify_integration --hidden-import track_utils --hidden-import url_parser --hidden-import utils harmony/harmony.py
 
     - name: Rename binary (Windows)
       if: matrix.os == 'windows-latest'
