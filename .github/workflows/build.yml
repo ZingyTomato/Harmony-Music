@@ -64,7 +64,7 @@ jobs:
 
     - name: Upload binary as artifact
       if: github.event_name == 'push' || github.event_name == 'pull_request'
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.binary_name }}${{ matrix.binary_extension }}
         path: ./dist/${{ matrix.binary_name }}${{ matrix.binary_extension }}
