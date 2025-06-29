@@ -1,12 +1,16 @@
+"""
+Database management for Playlists and Queue
+"""
+
 import sqlite3
 import json
 from termcolor import colored
 
-class PlaylistDB:
+class DB:
     def __init__(self, config_folder: str):
         self.playlist_conn = sqlite3.connect(f'{config_folder}/playlist.db') ## DB to store playlists
         self.playlist_cursor = self.playlist_conn.cursor()
-        self.queue_conn = sqlite3.connect(f'{config_folder}/queue.db') ## DB to store playlists
+        self.queue_conn = sqlite3.connect(f'{config_folder}/queue.db') ## DB to store queue
         self.queue_cursor = self.queue_conn.cursor()
         self.create_table()
 

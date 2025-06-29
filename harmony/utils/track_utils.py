@@ -1,4 +1,4 @@
-from utils import format_text, format_duration
+from utils.core_utils import format_text, format_duration
 
 def create_track(track_json: dict):
     """

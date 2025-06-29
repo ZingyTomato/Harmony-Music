@@ -5,8 +5,7 @@ Harmony - An open souce CLI music streamer based on MPV.
 
 import argparse
 import sys
-from music_player import MusicPlayer
-
+from functions.core import MusicPlayer
 
 def main():
     """Entry Point"""
@@ -51,7 +50,6 @@ def main():
 
     try:
         player = MusicPlayer()
-        player.set_lyrics_mode(args.disable_lyrics) ## Set synced lyrics preference
         if args.trending:
             player.get_trending()
         elif args.version:
@@ -87,7 +85,6 @@ def main():
     except Exception as e:
         print(f"Error: {e}")
         sys.exit(1)
-
 
 if __name__ == '__main__':
     main()

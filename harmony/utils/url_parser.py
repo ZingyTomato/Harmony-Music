@@ -1,3 +1,7 @@
+"""
+Functions for formatting and identifying common URL patterns
+"""
+
 import re
 
 class URLParser:

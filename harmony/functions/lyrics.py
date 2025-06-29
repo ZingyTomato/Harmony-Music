@@ -1,26 +1,26 @@
-"""
-Lyrics search and conversion functionality
-"""
-
 from pathlib import Path
 import syncedlyrics
 
 
 def create_lyrics_file(query: str, directory: str, synced: bool):
     """Creates a .vtt file for current track"""
+    vtt_path = Path(directory) / "lyrics.vtt"
 
-    if synced == False: ## If the user has specified no synced lyrics
-        Path(f"{directory}/lyrics.vtt").write_text("WEBVTT\n\n")
+    if not synced:
+        vtt_path.write_text("WEBVTT\n\n")
         return
 
     try:
-        syncedlyrics.search(query, plain_only=False, save_path=f"{directory}/lyrics.lrc",
-                            providers=["Lrclib"]) ## Seems to provide the most accurate synced lyrics amongst other providers.
-
-        convert_lrc_to_vtt(f"{directory}/lyrics.lrc", f"{directory}/lyrics.vtt")
+        syncedlyrics.search(
+            query,
+            plain_only=False,
+            synced_only=True,
+            save_path=f"{directory}/lyrics.lrc",
+            providers=['NetEase', 'Lrclib']
+        )
+        convert_lrc_to_vtt(f"{directory}/lyrics.lrc", vtt_path)
     except:
-        # If lyrics fail, create empty file so mpv doesn't error
-        Path(f"{directory}/lyrics.vtt").write_text("WEBVTT\n\n")
+        vtt_path.write_text("WEBVTT\n\n")
 
 
 def convert_lrc_to_vtt(lrc_path: str, vtt_path: str):
@@ -34,12 +34,11 @@ def convert_lrc_to_vtt(lrc_path: str, vtt_path: str):
 
         for line in lines:
             line = line.strip()
-            if line and line.startswith('[') and ']' in line:
+            if line.startswith('[') and ']' in line:
                 timestamp = line[1:line.index(']')]
                 lyric = line[line.index(']') + 1:].strip()
-                if lyric:
-                    timestamps.append(timestamp)
-                    lyrics.append(lyric)
+                timestamps.append(timestamp)
+                lyrics.append(lyric)
 
         with open(vtt_path, 'w', encoding='utf-8') as f:
             f.write("WEBVTT\n\n")
@@ -47,11 +46,9 @@ def convert_lrc_to_vtt(lrc_path: str, vtt_path: str):
             for i, (timestamp, lyric) in enumerate(zip(timestamps, lyrics)):
                 start_time = timestamp.replace(',', '.')
 
-                # Calculate end time
                 if i < len(timestamps) - 1:
                     end_time = timestamps[i + 1].replace(',', '.')
                 else:
-                    # For last line, add 3 seconds
                     try:
                         minutes, rest = start_time.split(':')
                         seconds = float(rest) + 3
@@ -65,7 +62,6 @@ def convert_lrc_to_vtt(lrc_path: str, vtt_path: str):
                 f.write(f"{start_time} --> {end_time}\n{lyric}\n\n")
 
     except Exception:
-        # Create empty VTT file on error
         Path(vtt_path).write_text("WEBVTT\n\n")
 
-    Path(lrc_path).unlink(missing_ok=True) ## Delete the LRC file
+    Path(lrc_path).unlink(missing_ok=True)

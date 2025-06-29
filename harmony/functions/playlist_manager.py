@@ -1,21 +1,28 @@
+"""
+Playlist management: Creation, Deletion & Editing
+"""
+
 import json
 from termcolor import colored
-from utils import check_integers_with_spaces
-from track_utils import create_track
+from utils.core_utils import check_integers_with_spaces, extract_range_numbers
+from utils.track_utils import create_track
 from random import shuffle
 
 class PlaylistManager:
-    def __init__(self, playlist_db, playlist_queue: list, queue_manager):
+    def __init__(self, playlist_db, playlist_queue: list, queue_manager,
+                 loop: bool) -> None:
+        
         self.playlist_db = playlist_db
         self.playlist_queue = playlist_queue
         self.queue_manager = queue_manager # To use play_queue, play_specific_index, play_indexes
+        self.loop = loop
 
-    def playlist_info(self):
+    def playlist_info(self) -> None:
         """ Various options for playlists"""
         self.playlist_db.create_table()
 
         while True:
-            choice = input(colored(f"\nPick [(L)ist Playlists, (C)reate Playlist, (R)emove Playlist, (Q)uit]: ", 'red'))
+            choice = input(colored(f"\nPick [(S)how Playlists, (C)reate Playlist, (R)emove Playlist, (Q)uit]: ", 'red'))
 
             if choice.lower() == "c":
 
@@ -28,7 +35,7 @@ class PlaylistManager:
                     self.playlist_db.create_playlist(name)
                     continue
 
-            elif choice.lower() == "l":
+            elif choice.lower() == "s":
                 name, data = self.list_playlists()
                 if name is False and data is False:
                     print(colored("\nInvalid input!", 'red', attrs=['bold']))
@@ -59,8 +66,9 @@ class PlaylistManager:
 
             else:
                 print(colored("\nInvalid input!", 'red', attrs=['bold']))
+        return
 
-    def list_playlists(self):
+    def list_playlists(self) -> None:
         """ List all playlists in the db """
         self.playlist_db.create_table()
 
@@ -87,9 +95,9 @@ class PlaylistManager:
             return result
         except ValueError:
             return False, False
+        return
 
-
-    def list_playlist_content(self, name: str, data: dict):
+    def list_playlist_content(self, name: str, data: dict) -> None:
         """ List contents of a playlist in the db """
         print(colored(f"\nContents of: {name}\n", 'cyan', attrs=['bold']))
         for i, track in enumerate(json.loads(data), 1):
@@ -99,8 +107,9 @@ class PlaylistManager:
         self.playlist_queue.clear() # Clear existing playlist queue before loading new one
         self.playlist_queue.extend(json.loads(data))
         self.edit_playlist_queue(name)
+        return
 
-    def edit_playlist_queue(self, name: str):
+    def edit_playlist_queue(self, name: str) -> None:
         """ Options to edit the current playlist """
         while True:
             if not self.playlist_queue:
@@ -108,7 +117,7 @@ class PlaylistManager:
                 return
 
             query = input(colored("\nEdit the playlist ", 'cyan', attrs=['bold']) +
-                            colored("[(P)lay, (R)emove, (M)ove, (S)huffle, (B)ack, (L)ist tracks]: ", 'red'))
+                            colored("[(P)lay, (R)emove, (M)ove, (SH)uffle, (B)ack, (L)oop, (A)dd to queue, (S)how Tracks]: ", 'red'))
 
             if not query.strip():
                 continue
@@ -117,15 +126,25 @@ class PlaylistManager:
 
             if query.lower() == 'b':
                 break
+            
+            elif query.lower() == 'l':
+
+                if self.loop == False: ## Provide option to enable the loop after entering interactive mode
+                    self.loop = True
+                    print(colored("\nEnabled the Queue/Track loop!",
+                                  'green', attrs=['bold']))
+                else:
+                    self.loop = False
+                    print(colored("\nDisabled the Queue/Track loop!", 'red', attrs=['bold']))
 
             elif query.lower() == 'p':
-                self.queue_manager.play_queue(self.playlist_queue)
+                self.queue_manager.play_queue(self.playlist_queue, self.loop)
 
             elif check_integers_with_spaces(query):
-                self.queue_manager.play_indexes(query, self.playlist_queue)
+                self.queue_manager.play_indexes(query, self.playlist_queue, self.loop)
                 continue
 
-            elif query.lower() == 'l':
+            elif query.lower() == 's':
                 self.list_playlist_content(name, json.dumps(self.playlist_queue))
                 break
 
@@ -147,6 +166,19 @@ class PlaylistManager:
                             self.playlist_queue.pop(int(i) - 1)
                             self.playlist_db.update_playlist_db(name, self.playlist_queue)
                         continue
+                    
+                    elif extract_range_numbers(index) is not None: ## If indexes are separated by ..
+                        
+                        for i in sorted(extract_range_numbers(index), key=int, reverse=True): ## If multiple inputs are entered
+                            if i is None:
+                                pass
+                            print(colored(f"\nRemoved {self.playlist_queue[int(i) - 1]['title']} - {self.playlist_queue[int(i) - 1]['artist']}  ",
+                                  'green', attrs=['bold']))
+                            self.playlist_queue.pop(int(i) - 1)
+                            
+                        self.playlist_db.update_playlist_db(name, self.playlist_queue)
+                        return
+                    
                     else: # Handle single index removal
                         idx = int(index) - 1
                         if 0 <= idx < len(self.playlist_queue):
@@ -156,14 +188,35 @@ class PlaylistManager:
                             self.playlist_db.update_playlist_db(name, self.playlist_queue)
                         else:
                             print(colored("\nIndex out of range!", 'red', attrs=['bold']))
-
-
+                            
                 except ValueError:
                     print(colored("\nInvalid input!", 'red', attrs=['bold']))
                 except IndexError:
                     print(colored("\nIndex out of range!", 'red', attrs=['bold']))
 
-            elif query.lower() == 's':
+            elif query.lower() == 'a': ## Add a track from the playlist to the queue
+
+                try:
+                    index = input(colored(f"\nPick [1-{len(self.playlist_queue)}, (B)ack] to add: ", 'red'))
+
+                    if index.lower() == "b": ## Allow exiting the add sequence
+                        continue
+                    elif check_integers_with_spaces(index):
+                        for i in sorted(index.split(" "), key=int): ## If multiple inputs are entered
+                            if i is None:
+                                 pass             
+                            self.queue_manager.add_playlist_to_queue(self.playlist_queue[int(i) - 1])
+                            
+                    elif extract_range_numbers(index) is not None:
+                        for i in sorted(extract_range_numbers(index), key=int): ## If multiple inputs are entered
+                            if i is None:
+                                 pass             
+                            self.queue_manager.add_playlist_to_queue(self.playlist_queue[int(i) - 1])
+                    
+                except:
+                    print(colored("\nInvalid input entered!", 'red', attrs=['bold']))
+            
+            elif query.lower() == 'sh':
 
                 shuffle(self.playlist_queue) ## Shuffle the queue
                 print(colored("\nShuffled the playlist!", 'green', attrs=['bold']))
@@ -188,3 +241,4 @@ class PlaylistManager:
                 print(colored("\nInvalid option entered!", 'red', attrs=['bold']))
 
             self.playlist_db.update_playlist_db(name, self.playlist_queue)
+        return
