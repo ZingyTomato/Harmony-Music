@@ -90,10 +90,13 @@ class URLCommandHandler(CommandHandler):
     """Handles URL-based commands (Spotify URLs)."""
     
     def can_handle(self, command: str) -> bool:
-        # Check if command is a URL - we'll get the url_parser from player in handle()
-        return ('spotify.com' in command or 
-                'open.spotify.com' in command or
-                command.startswith('https://'))
+        # Check if command is a valid Spotify URL
+        from urllib.parse import urlparse
+        try:
+            parsed_url = urlparse(command)
+            return parsed_url.hostname in ['spotify.com', 'open.spotify.com']
+        except ValueError:
+            return False
     
     def handle(self, command: str, player: 'MusicPlayer') -> bool:
         # Parse the URL first
