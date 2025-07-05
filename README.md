@@ -41,11 +41,17 @@ Harmony is a command-line music player that streams audio directly from JioSaavn
 
 ## 💻 Installation
 
-Download the latest binary from the [releases section](https://github.com/ZingyTomato/harmonymusic/releases) or install directly:
+Download the latest binary from the [releases section](https://github.com/ZingyTomato/harmonymusic/releases) or install it directly:
 
 ```bash
 sudo wget https://github.com/ZingyTomato/harmonymusic/releases/latest/download/harmony -O /usr/local/bin/harmony
 sudo chmod a+rx /usr/local/bin/harmony
+```
+
+Or, install it from the [`AUR`](https://aur.archlinux.org/packages/harmony).
+
+```sh
+yay -S harmony
 ```
 
 ## 👨‍🔧 Usage
