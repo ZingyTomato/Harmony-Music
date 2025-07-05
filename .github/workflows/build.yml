@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-24.04 
     steps:
     - uses: actions/checkout@v4
     
@@ -30,7 +30,10 @@ jobs:
     - name: Build with PyInstaller
       run: |
         cd harmony
-        pyinstaller --onefile harmony.py
+        pyinstaller --onefile \
+          --exclude-binary libssl.so.3 \
+          --exclude-binary libcrypto.so.3 \
+          harmony.py
     
     - name: Upload to Release
       if: github.event_name == 'release'
