@@ -1,219 +1,49 @@
-name: Build and Release Harmony
-
 on:
-  push:
-    branches: [ main, develop ]
-    tags:
-      - 'v*'
-  pull_request:
-    branches: [ main ]
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        include:
-          - os: ubuntu-latest
-            platform: linux
-            arch: x64
-          - os: windows-latest
-            platform: windows
-            arch: x64
-          - os: macos-latest
-            platform: macos
-            arch: x64
-
+    runs-on: ubuntu-20.04
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Set up Python
-      uses: actions/setup-python@v4
+    - uses: actions/checkout@v4
+    
+    - uses: actions/setup-python@v5
       with:
-        python-version: '3.11'
-
-    - name: Install system dependencies (Ubuntu)
-      if: matrix.os == 'ubuntu-latest'
+        python-version: "3.10"
+    
+    - name: Install system dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y mpv
-
-    - name: Install system dependencies (macOS)
-      if: matrix.os == 'macos-latest'
-      run: |
-        brew install mpv
-
-    - name: Install system dependencies (Windows)
-      if: matrix.os == 'windows-latest'
-      shell: powershell
-      run: |
-        # Download and install mpv for Windows
-        Invoke-WebRequest -Uri "https://sourceforge.net/projects/mpv-player-windows/files/64bit/mpv-x86_64-20231217-git-d678618.7z/download" -OutFile "mpv.7z"
-        7z x mpv.7z
-        Move-Item mpv-x86_64-* mpv
-        echo "$env:GITHUB_WORKSPACE\mpv" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-
-    - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install pyinstaller
-        pip install -r requirements.txt || echo "No requirements.txt found, installing dependencies manually"
-        pip install sqlite3 termcolor spotipy syncedlyrics requests pathlib
-
-    - name: Create requirements.txt if not exists
-      run: |
-        if [ ! -f requirements.txt ]; then
-          echo "sqlite3" > requirements.txt
-          echo "termcolor" >> requirements.txt
-          echo "spotipy" >> requirements.txt
-          echo "syncedlyrics" >> requirements.txt
-          echo "requests" >> requirements.txt
-          echo "pathlib" >> requirements.txt
-        fi
-      shell: bash
-
-    - name: Build with PyInstaller (Linux/macOS)
-      if: matrix.os != 'windows-latest'
-      run: |
-        pyinstaller --onefile \
-          --name harmony-${{ matrix.platform }}-${{ matrix.arch }} \
-          --hidden-import=sqlite3 \
-          --hidden-import=termcolor \
-          --hidden-import=spotipy \
-          --hidden-import=syncedlyrics \
-          --hidden-import=requests \
-          --hidden-import=pathlib \
-          --add-data "*.py:." \
-          harmony.py
-
-    - name: Build with PyInstaller (Windows)
-      if: matrix.os == 'windows-latest'
-      run: |
-        pyinstaller --onefile `
-          --name harmony-${{ matrix.platform }}-${{ matrix.arch }}.exe `
-          --hidden-import=sqlite3 `
-          --hidden-import=termcolor `
-          --hidden-import=spotipy `
-          --hidden-import=syncedlyrics `
-          --hidden-import=requests `
-          --hidden-import=pathlib `
-          --add-data "*.py;." `
-          harmony.py
-
-    - name: List dist contents
-      run: ls -la dist/
-      shell: bash
-
-    - name: Upload artifacts for non-release builds
-      if: ${{ !startsWith(github.ref, 'refs/tags/') }}
-      uses: actions/upload-artifact@v4
-      with:
-        name: harmony-${{ matrix.platform }}-${{ matrix.arch }}
-        path: dist/harmony-${{ matrix.platform }}-${{ matrix.arch }}*
-        retention-days: 30
-
-    - name: Upload release assets
-      if: startsWith(github.ref, 'refs/tags/')
-      uses: actions/upload-artifact@v4
-      with:
-        name: harmony-${{ matrix.platform }}-${{ matrix.arch }}-release
-        path: dist/harmony-${{ matrix.platform }}-${{ matrix.arch }}*
-
-  release:
-    if: startsWith(github.ref, 'refs/tags/')
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
+        sudo apt-get install -y build-essential curl
     
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Download all artifacts
-      uses: actions/download-artifact@v4
-      with:
-        path: release-assets
-
-    - name: Display structure of downloaded files
-      run: ls -la release-assets/
-
-    - name: Extract version from tag
-      id: get_version
-      run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
+    - name: Install dependencies
+      run: |
+        cd harmony
+        pip install --upgrade pip
+        pip install -r requirements.txt pyinstaller
+    
+    - name: Build with PyInstaller
+      run: |
+        cd harmony
+        pyinstaller --onefile harmony.py
+    
+    - name: Upload to Release
+      if: github.event_name == 'release'
+      run: |
+        cd harmony
+        gh release upload ${{ github.event.release.tag_name }} ./dist/harmony
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Upload as Artifact
+      if: github.event_name == 'workflow_dispatch'
+      uses: actions/upload-artifact@v4
       with:
-        tag_name: ${{ github.ref }}
-        release_name: Harmony ${{ steps.get_version.outputs.VERSION }}
-        draft: false
-        prerelease: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
-        body: |
-          ## Harmony Music Player ${{ steps.get_version.outputs.VERSION }}
-          
-          ### Download
-          Choose the appropriate binary for your operating system:
-          - **Linux**: `harmony-linux-x64`
-          - **Windows**: `harmony-windows-x64.exe`  
-          - **macOS**: `harmony-macos-x64`
-          
-          ### Installation
-          1. Download the binary for your platform
-          2. Make it executable (Linux/macOS): `chmod +x harmony-*`
-          3. Run: `./harmony-*` or `harmony-windows-x64.exe`
-          
-          ### Requirements
-          - **All platforms**: MPV media player must be installed
-            - Linux: `sudo apt install mpv` or `sudo yum install mpv`
-            - macOS: `brew install mpv`
-            - Windows: Download from https://mpv.io/installation/
-          
-          ### Usage
-          ```bash
-          # Search and play music
-          ./harmony "Never Gonna Give You Up"
-          
-          # View trending tracks
-          ./harmony --trending
-          
-          # Manage playlists
-          ./harmony --playlist
-          
-          # Use Spotify URLs
-          ./harmony "https://open.spotify.com/track/4iV5W9uYEdYUVa79Axb7Rh"
-          ```
-
-    - name: Upload Linux Binary
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: release-assets/harmony-linux-x64-release/harmony-linux-x64
-        asset_name: harmony-linux-x64
-        asset_content_type: application/octet-stream
-
-    - name: Upload Windows Binary
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: release-assets/harmony-windows-x64-release/harmony-windows-x64.exe
-        asset_name: harmony-windows-x64.exe
-        asset_content_type: application/octet-stream
-
-    - name: Upload macOS Binary
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: release-assets/harmony-macos-x64-release/harmony-macos-x64
-        asset_name: harmony-macos-x64
-        asset_content_type: application/octet-stream
+        name: harmony
+        path: ./harmony/dist/harmony

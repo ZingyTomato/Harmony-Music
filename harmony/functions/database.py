@@ -4,7 +4,6 @@ Database management for Playlists and Queue
 
 import sqlite3
 import json
-from termcolor import colored
 
 class DB:
     def __init__(self, config_folder: str):
@@ -38,7 +37,6 @@ class DB:
         self.playlist_cursor.execute('''
             INSERT INTO playlists (name, metadata) VALUES (?, ?)''', (name, json.dumps([])))
         self.commit_db()
-        print(colored(f"\nCreated playlist {name}!", 'green', attrs=['bold']))
 
     def get_all_playlists(self):
         return self.playlist_cursor.execute('SELECT name, metadata FROM playlists').fetchall()
@@ -72,8 +70,6 @@ class DB:
             UPDATE playlists SET metadata = ? WHERE name = ?
         ''', (json.dumps(current_metadata), name))
         self.commit_db()
-        print(f"\nAdded {colored(track['title'], 'red', attrs=['bold'])} - "
-                      f"{colored(track['artist'], 'cyan')} to {colored(name, 'red', attrs=['bold'])}")
 
     def delete_playlist(self, name: str):
         self.playlist_cursor.execute('''

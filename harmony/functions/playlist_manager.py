@@ -3,10 +3,19 @@ Playlist management: Creation, Deletion & Editing
 """
 
 import json
-from termcolor import colored
-from utils.core_utils import check_integers_with_spaces, extract_range_numbers
+from utils.core_utils import (
+    check_integers_with_spaces, extract_range_numbers
+)
 from utils.track_utils import create_track
 from random import shuffle
+from rich.console import Console
+from rich.text import Text
+from rich.table import Table
+from rich.panel import Panel
+from rich.prompt import Prompt
+from rich import box
+
+console = Console()
 
 class PlaylistManager:
     def __init__(self, playlist_db, playlist_queue: list, queue_manager,
@@ -22,12 +31,40 @@ class PlaylistManager:
         self.playlist_db.create_table()
 
         while True:
-            choice = input(colored(f"\nPick [(S)how Playlists, (C)reate Playlist, (R)emove Playlist, (Q)uit]: ", 'red'))
+            
+            console.print("\n")
+            controls_panel = Panel(
+            "[bold cyan](S)how Playlists • (C)reate Playlist • (R)emove Playlist • (Q)uit[/bold cyan]",
+            title="Options",
+            border_style="dim",
+            padding=(0,2)
+            )
 
+            console.print(controls_panel, justify="center")
+            
+            choice = Prompt.ask(
+                "\n[bold red]Command[/bold red]",
+                choices=['s', 'c', 'r', 'q'],
+                show_choices=False
+            )
+            
             if choice.lower() == "c":
 
-                name = input(colored(f"\nEnter playlist name [(B)ack]: ", 'red'))
-
+                options_panel = Panel(
+                        "[bold cyan](B)ack[/bold cyan]",
+                        title="Controls",
+                        border_style="dim",
+                        padding=(0,2)
+                    )
+                    
+                console.print(options_panel, justify="center")
+                
+                
+                name = Prompt.ask(
+                "\n[bold red]\nEnter playlist name[/bold red]",
+                show_choices=False
+                    )
+                
                 if not name or name.lower() == "b":
                     continue
 
@@ -38,7 +75,13 @@ class PlaylistManager:
             elif choice.lower() == "s":
                 name, data = self.list_playlists()
                 if name is False and data is False:
-                    print(colored("\nInvalid input!", 'red', attrs=['bold']))
+                    console.print(Panel(
+                        "[red]Invalid input![/red]",
+                        title="⚠ Invalid Input",
+                        border_style="red",
+                        box=box.ROUNDED,
+                        padding=(0, 1)
+                    ))
                 elif name is not None and data is not None:
                     self.list_playlist_content(name, data)
                 continue
@@ -47,17 +90,35 @@ class PlaylistManager:
                 try:
                     name, data = self.list_playlists()
                 except Exception:
-                    print(colored("\nInvalid input!", 'red', attrs=['bold']))
+                    console.print(Panel(
+                        "[red]Invalid input![/red]",
+                        title="⚠ Invalid Input",
+                        border_style="red",
+                        box=box.ROUNDED,
+                        padding=(0, 1)
+                    ))
                     continue
 
                 if name is None and data is None:
                     continue
                 elif name is None or name is False:
-                    print(colored("\nInvalid input!", 'red', attrs=['bold']))
+                    console.print(Panel(
+                        "[red]Invalid input![/red]",
+                        title="⚠ Invalid Input",
+                        border_style="red",
+                        box=box.ROUNDED,
+                        padding=(0, 1)
+                    ))
                     continue
 
                 self.playlist_db.delete_playlist(name)
-                print(colored(f"\nDeleted playlist {name}!", 'red', attrs=['bold']))
+                console.print(Panel(
+                    f"[red]Deleted playlist {name}![/red]",
+                    title="✗ Playlist Deleted",
+                    border_style="red",
+                    box=box.ROUNDED,
+                    padding=(0, 1)
+                ))
                 continue
 
             elif choice.lower() == "q":
@@ -65,7 +126,13 @@ class PlaylistManager:
                 return
 
             else:
-                print(colored("\nInvalid input!", 'red', attrs=['bold']))
+                console.print(Panel(
+                    "[red]Invalid input![/red]",
+                    title="⚠ Invalid Input",
+                    border_style="red",
+                    box=box.ROUNDED,
+                    padding=(0, 1)
+                ))
         return
 
     def list_playlists(self) -> None:
@@ -75,16 +142,50 @@ class PlaylistManager:
         results = self.playlist_db.get_all_playlists()
 
         if not results:
-            print(colored(f"\nNo playlists!", 'red', attrs=['bold']))
+            console.print(Panel(
+                "[red]No playlists found![/red]",
+                title="⚠ No Playlists",
+                border_style="red",
+                box=box.ROUNDED,
+                padding=(0, 1)
+            ))
             return None, None
 
-        print(colored(f"\nCurrent Playlists: \n", 'cyan', attrs=['bold']))
+        table = Table(
+            title=f"\n[bold cyan]Current Playlists: \n[/bold cyan]",
+            show_header=True,
+            header_style="bold magenta",
+            border_style="blue",
+            box=box.ROUNDED
+        )
+        
+        table.add_column("#", style="green", width=3, justify="right")
+        table.add_column("Name", style="red", min_width=20)
+        table.add_column("No. Of Tracks", style="yellow", width=8, justify="center")
+        
         for i, row in enumerate(results, 1):
             name, metadata = row
-            print(f"{colored(str(i), 'green')}. {colored(name, 'red', attrs=['bold'])} - {colored(len(json.loads((metadata))), 'green', attrs=['bold'])} tracks")
+            table.add_row(str(i), name, str(len(json.loads((metadata)))))
 
+        console.print(table, justify="center")
+        
         count = self.playlist_db.get_playlist_count()
-        choice = input(colored(f"\nPick [1-{count}, (B)ack]: ", 'red'))
+        
+        console.print("\n")
+        options_panel = Panel(
+            "[bold red]Pick[/bold red] [dim]1-{}[/dim] • [bold cyan](B)ack[/bold cyan]".format(count),
+            title="Options",
+            border_style="dim",
+            padding=(0,2)
+        )
+
+        console.print(options_panel, justify="center")
+        
+        choice = Prompt.ask(
+                f"\n[bold red]\nSelect Playlist[/bold red]",
+                show_choices=False
+            )
+
         if choice == "b":
             return None, None
 
@@ -99,11 +200,24 @@ class PlaylistManager:
 
     def list_playlist_content(self, name: str, data: dict) -> None:
         """ List contents of a playlist in the db """
-        print(colored(f"\nContents of: {name}\n", 'cyan', attrs=['bold']))
+        table = Table(
+            title=f"\n[bold cyan]Contents of: {name}[/bold cyan]\n",
+            show_header=True,
+            header_style="bold magenta",
+            border_style="blue",
+            box=box.ROUNDED
+        )
+        
+        table.add_column("#", style="green", width=3, justify="right")
+        table.add_column("Title", style="red", min_width=20)
+        table.add_column("Artist", style="cyan", min_width=15)
+        table.add_column("Duration", style="yellow", width=8, justify="center")
+        
         for i, track in enumerate(json.loads(data), 1):
-            print(f"{colored(str(i), 'green')}. {colored(track['title'], 'red', attrs=['bold'])} - "
-                      f"{colored(track['artist'], 'cyan')}")
+            table.add_row(str(i), track['title'], track['artist'], track['duration'])
 
+        console.print(table, justify="center")
+        
         self.playlist_queue.clear() # Clear existing playlist queue before loading new one
         self.playlist_queue.extend(json.loads(data))
         self.edit_playlist_queue(name)
@@ -113,12 +227,29 @@ class PlaylistManager:
         """ Options to edit the current playlist """
         while True:
             if not self.playlist_queue:
-                print(colored("Playlist is empty!", 'red', attrs=['bold']))
+                console.print(Panel(
+                    "[red]Playlist is empty![/red]",
+                    title="⚠ Empty Playlist",
+                    border_style="red",
+                    box=box.ROUNDED,
+                    padding=(0, 1)
+                ))
                 return
+            
+            options_panel = Panel(
+                "[bold red]Pick[/bold red] [dim]1-{}[/dim] • [bold cyan](P)lay • (R)emove • (M)ove • (SH)uffle • (B)ack • (L)oop • (A)dd to queue • (S)how Tracks[/bold cyan]".format(len(self.playlist_queue)),
+                border_style="dim",
+                title="Options",
+                padding=(0,2)
+            )
+            
+            console.print(options_panel, justify="center")
 
-            query = input(colored("\nEdit the playlist ", 'cyan', attrs=['bold']) +
-                            colored("[(P)lay, (R)emove, (M)ove, (SH)uffle, (B)ack, (L)oop, (A)dd to queue, (S)how Tracks]: ", 'red'))
-
+            query = Prompt.ask(
+                "\n[bold cyan]Edit the playlist[/bold cyan]",
+                show_choices=False
+            )
+            
             if not query.strip():
                 continue
 
@@ -131,11 +262,22 @@ class PlaylistManager:
 
                 if self.loop == False: ## Provide option to enable the loop after entering interactive mode
                     self.loop = True
-                    print(colored("\nEnabled the Queue/Track loop!",
-                                  'green', attrs=['bold']))
+                    console.print(Panel(
+                        "[green]Enabled the Queue/Track loop![/green]",
+                        title="✓ Loop Enabled",
+                        border_style="green",
+                        box=box.ROUNDED,
+                        padding=(0, 1)
+                    ))
                 else:
                     self.loop = False
-                    print(colored("\nDisabled the Queue/Track loop!", 'red', attrs=['bold']))
+                    console.print(Panel(
+                        "[red]Disabled the Queue/Track loop![/red]",
+                        title="✗ Loop Disabled",
+                        border_style="red",
+                        box=box.ROUNDED,
+                        padding=(0, 1)
+                    ))
 
             elif query.lower() == 'p':
                 self.queue_manager.play_queue(self.playlist_queue, self.loop)
@@ -149,8 +291,21 @@ class PlaylistManager:
                 break
 
             elif query.lower() == 'r': ## Remove a track from the queue
-
-                index = input(colored(f"\nPick [1-{len(self.playlist_queue)}, (B)ack] to remove: ", 'red'))
+                
+                console.print("\n")
+                options_panel = Panel(
+                    "[bold red]Pick[/bold red] [dim]1-{} to remove[/dim] • [bold cyan](B)ack[/bold cyan]".format(len(self.playlist_queue)),
+                    border_style="dim",
+                    title="Options",
+                    padding=(0,2)
+                )
+                
+                console.print(options_panel, justify="center")
+                
+                index = Prompt.ask(
+                "\n[bold red]Remove Track[/bold red]",
+                show_choices=False
+                    )
 
                 if index.lower() == "b": ## Allow exiting the remove sequence
                     continue
@@ -161,8 +316,13 @@ class PlaylistManager:
                         for i in sorted(index.split(" "), key=int, reverse=True): ## If multiple inputs are entered
                             if i is None:
                                  pass
-                            print(colored(f"\nRemoved {self.playlist_queue[int(i) - 1]['title']} - {self.playlist_queue[int(i) - 1]['artist']}  ",
-                                'green', attrs=['bold']))
+                            console.print(Panel(
+                                f"[green]Removed {self.playlist_queue[int(i) - 1]['title']} - {self.playlist_queue[int(i) - 1]['artist']}![/green]",
+                                title="✓ Track Removed",
+                                border_style="green",
+                                box=box.ROUNDED,
+                                padding=(0, 1)
+                            ))
                             self.playlist_queue.pop(int(i) - 1)
                             self.playlist_db.update_playlist_db(name, self.playlist_queue)
                         continue
@@ -172,8 +332,13 @@ class PlaylistManager:
                         for i in sorted(extract_range_numbers(index), key=int, reverse=True): ## If multiple inputs are entered
                             if i is None:
                                 pass
-                            print(colored(f"\nRemoved {self.playlist_queue[int(i) - 1]['title']} - {self.playlist_queue[int(i) - 1]['artist']}  ",
-                                  'green', attrs=['bold']))
+                            console.print(Panel(
+                                f"[green]Removed {self.playlist_queue[int(i) - 1]['title']} - {self.playlist_queue[int(i) - 1]['artist']}![/green]",
+                                title="✓ Track Removed",
+                                border_style="green",
+                                box=box.ROUNDED,
+                                padding=(0, 1)
+                            ))
                             self.playlist_queue.pop(int(i) - 1)
                             
                         self.playlist_db.update_playlist_db(name, self.playlist_queue)
@@ -182,22 +347,58 @@ class PlaylistManager:
                     else: # Handle single index removal
                         idx = int(index) - 1
                         if 0 <= idx < len(self.playlist_queue):
-                            print(colored(f"\nRemoved {self.playlist_queue[idx]['title']} - {self.playlist_queue[idx]['artist']}  ",
-                                'green', attrs=['bold']))
+                            console.print(Panel(
+                                f"[green]Removed {self.playlist_queue[idx]['title']} - {self.playlist_queue[idx]['artist']}![/green]",
+                                title="✓ Track Removed",
+                                border_style="green",
+                                box=box.ROUNDED,
+                                padding=(0, 1)
+                            ))
                             self.playlist_queue.pop(idx)
                             self.playlist_db.update_playlist_db(name, self.playlist_queue)
                         else:
-                            print(colored("\nIndex out of range!", 'red', attrs=['bold']))
+                            console.print(Panel(
+                                "[red]Index out of range![/red]",
+                                title="⚠ Invalid Index",
+                                border_style="red",
+                                box=box.ROUNDED,
+                                padding=(0, 1)
+                            ))
                             
                 except ValueError:
-                    print(colored("\nInvalid input!", 'red', attrs=['bold']))
+                    console.print(Panel(
+                        "[red]Invalid Input![/red]",
+                        title="⚠ Invalid Input",
+                        border_style="red",
+                        box=box.ROUNDED,
+                        padding=(0, 1)
+                    ))
                 except IndexError:
-                    print(colored("\nIndex out of range!", 'red', attrs=['bold']))
+                    console.print(Panel(
+                        "[red]Index out of range![/red]",
+                        title="⚠ Invalid Index",
+                        border_style="red",
+                        box=box.ROUNDED,
+                        padding=(0, 1)
+                    ))
 
             elif query.lower() == 'a': ## Add a track from the playlist to the queue
 
                 try:
-                    index = input(colored(f"\nPick [1-{len(self.playlist_queue)}, (B)ack] to add: ", 'red'))
+                    console.print("\n")
+                    options_panel = Panel(
+                        "[bold red]Pick[/bold red] [dim]1-{} to add[/dim] • [bold cyan](B)ack[/bold cyan]".format(len(self.playlist_queue)),
+                        border_style="dim",
+                        title="Options",
+                        padding=(0,2)
+                    )
+                    
+                    console.print(options_panel, justify="center")
+        
+                    index = Prompt.ask(
+                        "\n[bold red]Add track[/bold red]",
+                        show_choices=False
+                    )
 
                     if index.lower() == "b": ## Allow exiting the add sequence
                         continue
@@ -214,31 +415,89 @@ class PlaylistManager:
                             self.queue_manager.add_playlist_to_queue(self.playlist_queue[int(i) - 1])
                     
                 except:
-                    print(colored("\nInvalid input entered!", 'red', attrs=['bold']))
-            
+                    console.print(Panel(
+                        "[red]Invalid input entered![/red]",
+                        title="⚠ Invalid Input",
+                        border_style="red",
+                        box=box.ROUNDED,
+                        padding=(0, 1)
+                    ))
+                              
             elif query.lower() == 'sh':
 
                 shuffle(self.playlist_queue) ## Shuffle the queue
-                print(colored("\nShuffled the playlist!", 'green', attrs=['bold']))
+                console.print(Panel(
+                    "[green]Shuffled the playlist![/green]",
+                    title="🔀 Playlist Shuffled",
+                    border_style="green",
+                    box=box.ROUNDED,
+                    padding=(0, 1)
+                ))
 
             elif query.lower() == 'm': ## Move tracks within the queue
 
-                curent_index = input(colored(f"\nPick [1-{len(self.playlist_queue)}, (B)ack] to move: ", 'red'))
-                if curent_index.lower() == "b": ## Allow exiting the remove sequence
+                console.print("\n")
+                options_panel = Panel(
+                    "[bold red]Pick[/bold red] [dim]1-{} to move from[/dim] • [bold cyan](B)ack[/bold cyan]".format(len(self.playlist_queue)),
+                    border_style="dim",
+                    title="Options",
+                    padding=(0,2)
+                )
+                    
+                console.print(options_panel, justify="center")
+        
+                current_index = Prompt.ask(
+                    "\n[bold red]Move track[/bold red]",
+                    show_choices=False
+                )
+                
+                if current_index.lower() == "b": ## Allow exiting the remove sequence
                     continue
+                
+                console.print("\n")
+                options_panel = Panel(
+                    "[bold red]Pick[/bold red] [dim]1-{} to move to[/dim] • [bold cyan](B)ack[/bold cyan]".format(len(self.playlist_queue)),
+                    border_style="dim",
+                    title="Options",
+                    padding=(0,2)
+                )
+                    
+                console.print(options_panel, justify="center")
+        
+                final_index = Prompt.ask(
+                    "\n[bold red]Move track to[/bold red]",
+                    show_choices=False
+                )
 
-                final_index = input(colored(f"\nPick [1-{len(self.playlist_queue)}, (B)ack] to move to: ", 'red'))
                 if final_index.lower() == "b": ## Allow exiting the remove sequence
                     continue
 
                 try:
-                    self.playlist_queue.insert(int(final_index) - 1, self.playlist_queue.pop(int(curent_index) - 1))
-                    print(colored(f"\nMoved track to position {final_index} ", 'green', attrs=['bold']))
+                    self.playlist_queue.insert(int(final_index) - 1, self.playlist_queue.pop(int(current_index) - 1))
+                    console.print(Panel(
+                        f"[green]Moved track to position {final_index}![/green]",
+                        title="✓ Track Moved",
+                        border_style="green",
+                        box=box.ROUNDED,
+                        padding=(0, 1)
+                    ))
                 except:
-                    print(colored("\nTrack index out of range!", 'red', attrs=['bold']))
+                    console.print(Panel(
+                        "[red]Track index out of range![/red]",
+                        title="⚠ Invalid Index",
+                        border_style="red",
+                        box=box.ROUNDED,
+                        padding=(0, 1)
+                    ))
 
             else:
-                print(colored("\nInvalid option entered!", 'red', attrs=['bold']))
+                console.print(Panel(
+                    "[red]Invalid input entered![/red]",
+                    title="⚠ Invalid Input",
+                    border_style="red",
+                    box=box.ROUNDED,
+                    padding=(0, 1)
+                ))
 
             self.playlist_db.update_playlist_db(name, self.playlist_queue)
         return
