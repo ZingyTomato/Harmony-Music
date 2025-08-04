@@ -354,7 +354,7 @@ class MusicPlayer:
     """Main music player class handling all functionality"""
 
     def __init__(self):
-        self.__version__ = "0.7.0"
+        self.__version__ = "0.7.1"
         self.playlist_queue = []
         self.headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101 Firefox/91.0'
@@ -381,9 +381,12 @@ class MusicPlayer:
         
         self.config_folder = create_config_folder()
         self.config_file = create_config_file(self.config_folder)
-        self.synced_lyrics = get_config_value("SHOW_SYNCED_LYRICS", self.config_file)
-        self.loop = get_config_value("LOOP_QUEUE", self.config_file)
-        self.persistent_queue = get_config_value("PERSISTENT_QUEUE", self.config_file)
+        self.synced_lyrics = get_config_value("SHOW_SYNCED_LYRICS", self.config_file,
+                                              self.config_folder)
+        self.loop = get_config_value("LOOP_QUEUE", self.config_file, 
+                                     self.config_folder)
+        self.persistent_queue = get_config_value("PERSISTENT_QUEUE", self.config_file,
+                                                 self.config_folder)
         
         self.playlist_db = DB(self.config_folder)
         self.queue = self.playlist_db.get_queue_from_db()

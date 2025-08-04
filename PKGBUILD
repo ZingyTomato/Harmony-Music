@@ -1,5 +1,5 @@
 pkgname=harmony
-pkgver=0.7.0
+pkgver=0.7.1
 pkgrel=1
 pkgdesc="An open souce CLI music streamer based on MPV."
 arch=('any')

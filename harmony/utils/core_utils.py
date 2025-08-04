@@ -100,7 +100,7 @@ def create_config_file(directory: str) -> str:
             
     return filepath
 
-def get_config_value(key, filepath):
+def get_config_value(key, filepath, directory):
     """Retrieve specific values from the config file"""
     if not os.path.exists(filepath):
         data = {"SHOW_SYNCED_LYRICS": True,

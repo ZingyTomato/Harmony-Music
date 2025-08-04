@@ -6,11 +6,12 @@ import pylast
 from utils.core_utils import get_config_value, create_config_folder
 import time
 
-API_KEY = get_config_value("LASTFM_API_KEY", f"{create_config_folder()}/config.json") 
-API_SECRET = get_config_value("LASTFM_API_SECRET", f"{create_config_folder()}/config.json") 
+directory = create_config_folder()
+API_KEY = get_config_value("LASTFM_API_KEY", f"{directory}/config.json", directory) 
+API_SECRET = get_config_value("LASTFM_API_SECRET", f"{directory}/config.json", directory) 
 
-USERNAME = get_config_value("LASTFM_USERNAME", f"{create_config_folder()}/config.json") 
-PASSWORD_HASH = pylast.md5(get_config_value("LASTFM_PASSWORD", f"{create_config_folder()}/config.json"))
+USERNAME = get_config_value("LASTFM_USERNAME", f"{directory}/config.json", directory) 
+PASSWORD_HASH = pylast.md5(get_config_value("LASTFM_PASSWORD", f"{directory}/config.json", directory))
 
 ENABLED = False
 
