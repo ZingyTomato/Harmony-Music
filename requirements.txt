@@ -2,5 +2,5 @@ requests==2.32.4
 rich==14.0.0
 argparse==1.4.0
 syncedlyrics==1.0.1
-spotipy==2.25.1
+spotipy==2.25.2
 pylast==5.5.0
