@@ -1,4 +1,4 @@
-requests==2.32.4
+requests==2.33.0
 rich==14.0.0
 argparse==1.4.0
 syncedlyrics==1.0.1
